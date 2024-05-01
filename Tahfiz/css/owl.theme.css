@@ -1,0 +1,141 @@
+/*
+* 	Owl Carousel Owl Demo Theme 
+*/
+
+.owl-controlls{
+    margin-top: 10px;
+	text-align: center;
+}
+
+/* Styling Next and Prev buttons */
+
+.owl-controlls .owl-buttons div{
+	color: #FFF;
+	display: inline-block;
+	margin: 5px;
+	padding: 3px 10px;
+	font-size: 12px;
+	border-radius:2px;
+	background: #ec1d25;
+	opacity:1;
+}
+/* Clickable class fix problem with hover on touch devices */
+/* Use it for non-touch hover action */
+.owl-controlls.clickable .owl-buttons div:hover{
+	opacity: 1;
+	text-decoration: none;
+}
+
+/* Styling Pagination*/
+
+.owl-controlls .owl-page{
+	display: inline-block;
+}
+.owl-controlls .owl-page span{
+	display: block;
+	width: 12px;
+	height: 12px;
+	margin: 5px 7px;
+	opacity: 0.5;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+	background: #ec1d25;
+}
+
+.owl-controlls .owl-page.active span,
+.owl-controlls.clickable .owl-page:hover span{
+	opacity: 1;
+}
+
+/* If PaginationNumbers is true */
+
+.owl-controlls .owl-page span.owl-numbers{
+	height: auto;
+	width: auto;
+	color: #FFF;
+	padding: 2px 10px;
+	font-size: 12px;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;
+}
+.owl-prev,
+.owl-next{
+    font-family: 'fontAwesome';
+	width:30px;
+	height:30px;
+
+}
+.owl-prev{
+	float:left;
+	margin:-23% 0 0 -23px !important;
+	position:relative;
+	z-index:999999;
+}
+.owl-next{
+	float:right;
+	margin:-23% -23px 0 0 !important;
+	position:relative;
+	z-index:999999;
+}
+.owl-prev:before{
+    content: "\f053";
+    margin-right:0px;
+}
+.owl-next:after{
+    content: "\f054";
+    margin-right:0px;
+}
+
+@media (max-width: 1024px) {
+	.owl-prev{
+	margin:-26% 0 0 0 !important;
+}
+.owl-next{
+	margin:-26% 0 0 0 !important;
+}
+}
+@media (max-width: 768px) {
+	.owl-prev{
+	margin:-33% 0 0 0 !important;
+}
+.owl-next{
+	margin:-33% 0 0 0 !important;
+}
+}
+@media (max-width: 640px) {
+	.owl-prev{
+	margin:-40% 0 0 0 !important;
+}
+.owl-next{
+	margin:-40% 0 0 0 !important;
+}
+}
+@media (max-width: 480px) {
+	.owl-prev{
+	margin:-53% 0 0 0 !important;
+}
+.owl-next{
+	margin:-53% 0 0 0 !important;
+}
+}
+@media (max-width: 360px) {
+	.owl-prev{
+	margin:-71% 0 0 0 !important;
+}
+.owl-next{
+	margin:-71% 0 0 0 !important;
+}
+}
+@media (max-width: 360px) {
+	.owl-prev{
+	margin:-80% 0 0 0 !important;
+}
+.owl-next{
+	margin:-80% 0 0 0 !important;
+}
+}
+
+
+

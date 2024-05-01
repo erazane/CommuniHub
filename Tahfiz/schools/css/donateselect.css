@@ -1,0 +1,65 @@
+.amount {
+	width: 30%;
+	position: relative;
+	padding: 6px 0px;
+}
+
+.button1 {
+	width: 100%;
+	background-color: gray;
+	margin-bottom: 10px;
+	text-align: center;
+	color: white;
+	padding: 15px 0px 15px 0px;
+	border-radius: 4px;
+	font-size: 14px;
+	cursor: pointer;
+	font-weight: 600;
+	display: inline-block;
+
+	-webkit-transition: 400ms background-color;
+	-moz-transition: 800ms opacity, 800ms right;
+	-ms-transition: 800ms opacity, 800ms right;
+	-o-transition: 800ms opacity, 800ms right;
+	transition: 200ms background-color;
+}
+
+.button1:hover {
+	background-color: #393939;
+}
+
+.button1.selected {
+	background-color: #393939;
+}
+
+.button1 input {
+	min-width: 34px;
+	font-size: 14px;
+	font-weight: 600;
+	border: none;
+	background-color: transparent;
+	color: white;
+	font-family: Montserrat, sans-serif;
+	font-size: 14px;
+	font-stretch: normal;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 600;
+	border-bottom: 2px dashed white;
+	-webkit-font-smoothing: antialiased;
+
+	-webkit-transition: all 0.15s ease-out;
+	-moz-transition: all 0.15s ease-out;
+	-o-transition: all 0.15s ease-out;
+	transition: all 0.15s ease-out;
+}
+
+.set-amount {
+	max-width: 96px;
+	font-family: Montserrat, sans-serif;
+	font-size: 14px;
+	font-stretch: normal;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 600;
+}
