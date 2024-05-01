@@ -48,7 +48,7 @@ if (isset($_POST['Submit'])) {
     $UserUserName = mysqli_real_escape_string($dbc, $_POST['UserUserName']);
     $inputPwd = crypt($_POST['UserPwd'], 'ahookdemok');
     
-    $query = "SELECT user.*, commitee.CommiteeID FROM user INNER JOIN commitee ON user.UserID = commitee.UserID WHERE UserUserName='$UserUserName' ";
+    $query = "SELECT * FROM user WHERE UserUserName='$UserUserName' AND UserPwd='$UserPwd'";
     $result = mysqli_query($dbc, $query);
 
     if (mysqli_num_rows($result) == 1) {
@@ -58,10 +58,10 @@ if (isset($_POST['Submit'])) {
         $_SESSION['UserFirstName'] = $userRow['UserFirstName'];
         $_SESSION['UserLastName'] = $userRow['UserLastName'];
 
-        header('Location: http://localhost/php-projects/CommuniHub/Committee/index.php');
+        header('Location: http://localhost/php-projects/CommuniHub/front-end/indexLogin.php');
     } else {
         // $_SESSION['login'] = "<div class='error text-center'>Username or password is incorrect.</div>";
-        header('Location: http://localhost/php-projects/CommuniHub/Committee/Commmittee-login.php');
+        header('Location: http://localhost/php-projects/CommuniHub/fron-end/user-login.php');
     }
 }
 ?>
@@ -78,8 +78,8 @@ if (isset($_POST['Submit'])) {
                     <!-- Right column for user details and payment -->
                     <div class="col-md-6">
                         <div class="login-title">
-                            <h2>Committee Login</h2>
-                            <!-- <p>Dont have an account? <a href="#" class="link-primary">Create your account here !</a></p> -->
+                            <h2>User Login</h2>
+                            <p>Dont have an account? <a href="user-register.php" class="link-primary">Create your account here !</a></p>
                         </div>
                         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 

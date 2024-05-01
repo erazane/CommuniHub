@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 include('include/header.php');
@@ -44,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $_SESSION['status'] = "Unable to insert data";
                 $_SESSION['status_code'] = "error";
-                echo "Admin with the same name already exists!";
+                echo "Admin already exists!";
             }
      }
     

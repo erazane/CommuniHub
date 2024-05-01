@@ -62,8 +62,7 @@ if (isset($_POST['Submit'])) {
     $UserUserName = mysqli_real_escape_string($dbc, $_POST['UserUserName']);
     $UserPwd = crypt($_POST['UserPwd'], 'ahookdemok'); // Consider using password_hash() in the future
 
-    $query = "SELECT * FROM user WHERE UserUserName='$UserUserName' AND UserPwd='$UserPwd'
-    ";
+    $query = "SELECT * FROM user WHERE UserUserName='$UserUserName' AND UserPwd='$UserPwd'";
     $result = @mysqli_query($dbc, $query); // Run the query.
 
     if (mysqli_num_rows($result) == 1) {

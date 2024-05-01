@@ -112,7 +112,10 @@ a:focus {
 .header_section .header_bottom {
   padding: 10px 0;
 }
-
+.contact_nav .user_info {
+  display: flex; /* Use Flexbox */
+  align-items: center; /* Align items vertically */
+}
 .navbar-brand {
   padding: 0;
   margin: 0;

@@ -1,3 +1,22 @@
+<?php
+
+require_once('../Database/database.php');
+
+// Make the query.
+$query = "SELECT UserID , UserFirstName, UserLastName,
+FROM user";
+$result = mysqli_query($dbc, $query); // Run the query.
+
+//checking the session
+if(isset($_SESSION['UserFirstName']) && isset($_SESSION['UserLastname'])) {
+  $userFirstName = $_SESSION['UserFirstName'];
+  $userLastName = $_SESSION['UserLastName'];
+}else{
+  $userFirstName = "";
+  $userLastName = "";
+}
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -42,20 +61,32 @@
     <header class="header_section">
       <div class="header_top">
         <div class="container-fluid">
-          <div class="contact_nav">
-            <a href="">
+          <!-- <div class="contact_nav"> -->
+            <!-- <a href="">
               <i class="fa fa-phone" aria-hidden="true"></i>
               <span>
                 Call : +01 123455678990
               </span>
-            </a>
-            <a href="">
-              <i class="fa fa-envelope" aria-hidden="true"></i>
-              <span>
-                Email : CommuniHub@gmail.com
-              </span>
-            </a>
-          </div>
+            </a> -->
+            
+            <div class="contact_nav">
+              <div class="user-info">
+              <span style="color: #ffffff; font-weight: bold;"> <!-- Adjust font weight as needed -->
+                    Welcome Committee !
+                </span>
+              </div>
+            <div class="user_info">
+                <i class="fa fa-user-circle fa-lg" aria-hidden="true" style="color: #ff8a1d;margin-right: 5px;"></i>
+                <span style="color: #ffffff; font-weight: bold;"> <!-- Adjust font weight as needed -->
+                    
+                    <?php 
+                    if (isset($_SESSION['UserFirstName']) && isset($_SESSION['UserLastName'])) {
+                        echo $_SESSION['UserFirstName'] . ' ' . $_SESSION['UserLastName'];
+                    } 
+                    ?>
+                </span>
+            </div>
+        </div>
         </div>
       </div>
       <div class="header_bottom">
@@ -100,4 +131,5 @@
         </div>
       </div>
     </header>
+
     <!-- end header section -->

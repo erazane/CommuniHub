@@ -99,6 +99,7 @@ a:focus {
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
+        
 }
 
 .header_section .header_top .contact_nav a {
@@ -111,6 +112,11 @@ a:focus {
 
 .header_section .header_bottom {
   padding: 10px 0;
+}
+
+.contact_nav .user_info {
+  display: flex; /* Use Flexbox */
+  align-items: center; /* Align items vertically */
 }
 
 .navbar-brand {

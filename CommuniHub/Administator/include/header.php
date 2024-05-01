@@ -1,3 +1,19 @@
+
+<?php
+require_once('../Database/database.php');
+
+// Make the query to get the admin name
+$query = "SELECT adminID, adminName FROM admin";
+$result = mysqli_query($dbc, $query);
+
+if (isset($_SESSION['adminName'])) {
+    $adminName = $_SESSION['adminName'];
+} else {
+    $adminName = ""; 
+}
+?>
+
+
 <!DOCTYPE html>
 <html>
 
@@ -42,20 +58,24 @@
     <header class="header_section">
       <div class="header_top">
         <div class="container-fluid">
-          <div class="contact_nav">
-            <a href="">
-              <i class="fa fa-phone" aria-hidden="true"></i>
-              <span>
-                Call : +01 123455678990
-              </span>
-            </a>
-            <a href="">
-              <i class="fa fa-envelope" aria-hidden="true"></i>
-              <span>
-                Email : CommuniHub@gmail.com
-              </span>
-            </a>
-          </div>
+        <div class="contact_nav">
+              <div class="user-info">
+              <span style="color: #ffffff; font-weight: bold;"> <!-- Adjust font weight as needed -->
+                    Welcome Administator !
+                </span>
+              </div>
+            <div class="user_info">
+                <i class="fa fa-user-circle fa-lg" aria-hidden="true" style="color: #ff8a1d;margin-right: 5px;"></i>
+                <span style="color: #ffffff; font-weight: bold;"> <!-- Adjust font weight as needed -->
+                    
+                    <?php 
+                    if (isset($_SESSION['adminName'])) {
+                        echo $_SESSION['adminName'] ;
+                    } 
+                    ?>
+                </span>
+            </div>
+        </div>
         </div>
       </div>
       <div class="header_bottom">

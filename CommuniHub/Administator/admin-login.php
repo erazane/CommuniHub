@@ -53,7 +53,10 @@ if (isset($_POST['Submit'])) {
 
     if (mysqli_num_rows($result) == 1) {
         // $_SESSION['login'] = "<div class='success'>Login Successful.</div>";
+        $userRow = mysqli_fetch_assoc($result);
         $_SESSION['user'] = $AdminUsername;
+        $_SESSION['adminName'] = $userRow['adminName'];
+       
 
         header('Location: http://localhost/php-projects/CommuniHub/Administator/index.php');
     } else {

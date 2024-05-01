@@ -100,7 +100,7 @@
                   <a class="nav-link" href="contact.html">Contact</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="../user/userLogin.php">Login</a>
+                  <a class="nav-link" href="user-login.php">Login</a>
                 </li>
               </ul>
             </div>
@@ -123,7 +123,7 @@
               <h3>
                 A better community will create better lives.
           </h3>
-              <a href="../user/userRegister.php">
+              <a href="user-register.php">
                 Register
               </a>
             </div>
