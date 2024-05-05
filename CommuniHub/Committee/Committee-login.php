@@ -43,6 +43,7 @@ require_once ('../Database/database.php');
 
 <?php
 
+
 // Check for empty input
 if (isset($_POST['Submit'])) {
     $UserUserName = mysqli_real_escape_string($dbc, $_POST['UserUserName']);
@@ -75,7 +76,7 @@ if (isset($_POST['Submit'])) {
                     <div class="col-md-6">
                         <img class="img-fluid login-image" src="../Administator/images/loginpic.jpg" alt="login picture">
                     </div>
-                    <!-- Right column for user details and payment -->
+                    <!-- Right column for user details -->
                     <div class="col-md-6">
                         <div class="login-title">
                             <h2>Committee Login</h2>

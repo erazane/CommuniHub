@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once ('../Database/database.php');
+require_once('../Database/database.php');
 ?>
 
 <!DOCTYPE html>
@@ -8,11 +8,11 @@ require_once ('../Database/database.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Committee Login Page</title>
-
+    <title>User Login</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
+    
     <!-- Custom styles for this template -->
     <style>
         body {
@@ -43,28 +43,40 @@ require_once ('../Database/database.php');
 
 <?php
 
-// Check for empty input
 if (isset($_POST['Submit'])) {
     $UserUserName = mysqli_real_escape_string($dbc, $_POST['UserUserName']);
-    $inputPwd = crypt($_POST['UserPwd'], 'ahookdemok');
+    $UserPwd = mysqli_real_escape_string($dbc, $_POST['UserPwd']);
     
-    $query = "SELECT * FROM user WHERE UserUserName='$UserUserName' AND UserPwd='$UserPwd'";
+    $query = "SELECT * FROM user WHERE UserUserName='$UserUserName'";
     $result = mysqli_query($dbc, $query);
 
-    if (mysqli_num_rows($result) == 1) {
-        // $_SESSION['login'] = "<div class='success'>Login Successful.</div>";
-        $userRow = mysqli_fetch_assoc($result);
-        $_SESSION['user'] = $UserUserName;
-        $_SESSION['UserFirstName'] = $userRow['UserFirstName'];
-        $_SESSION['UserLastName'] = $userRow['UserLastName'];
+    if ($result && mysqli_num_rows($result) == 1) {
+        $row = mysqli_fetch_assoc($result);
+        $storedPwd = $row['UserPwd'];
 
-        header('Location: http://localhost/php-projects/CommuniHub/front-end/indexLogin.php');
+        // Verify password
+        if (password_verify($UserPwd, $storedPwd)) {
+            // Password is correct, set session variables
+            $_SESSION['UserID'] = $row["UserID"];
+            $_SESSION['user'] = $UserUserName;
+            $_SESSION['UserFirstName'] = $row['UserFirstName'];
+            $_SESSION['UserLastName'] = $row['UserLastName'];
+            header('Location: http://localhost/php-projects/CommuniHub/front-end/indexLogin.php');
+            exit();
+        } else {
+            // Incorrect password
+            header('Location: http://localhost/php-projects/CommuniHub/front-end/user-login.php');
+            exit();
+        }
     } else {
-        // $_SESSION['login'] = "<div class='error text-center'>Username or password is incorrect.</div>";
-        header('Location: http://localhost/php-projects/CommuniHub/fron-end/user-login.php');
+        // User not found
+        header('Location: http://localhost/php-projects/CommuniHub/front-end/user-login.php');
+        exit();
     }
 }
 ?>
+
+
 <div class="container-fluid">
     <div class="row justify-content-center align-items-center" style="height: 100vh;">
         <div class="col-md-8">
@@ -75,11 +87,11 @@ if (isset($_POST['Submit'])) {
                     <div class="col-md-6">
                         <img class="img-fluid login-image" src="../Administator/images/loginpic.jpg" alt="login picture">
                     </div>
-                    <!-- Right column for user details and payment -->
+                    <!-- Right column for user details -->
                     <div class="col-md-6">
                         <div class="login-title">
-                            <h2>User Login</h2>
-                            <p>Dont have an account? <a href="user-register.php" class="link-primary">Create your account here !</a></p>
+                            <h2>Committee Login</h2>
+                            <!-- <p>Dont have an account? <a href="#" class="link-primary">Create your account here !</a></p> -->
                         </div>
                         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 
@@ -105,10 +117,9 @@ if (isset($_POST['Submit'])) {
         </div>
     </div>
 </div>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- Bootstrap JavaScript -->
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

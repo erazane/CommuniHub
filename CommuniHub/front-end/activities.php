@@ -1,11 +1,14 @@
-<?php include('include/header.php'); ?>
+<?php 
+session_start();
+require_once('include/header.php'); 
+?>
 
     <!-- end header section -->
   </div>
 
   <?php
 require_once('../Database/database.php');
-session_start();
+
 $sessionUserID = $_SESSION["UserID"];
 // $query = "SELECT  
 //     ActivityID,ActivityName, ActivityLocation,

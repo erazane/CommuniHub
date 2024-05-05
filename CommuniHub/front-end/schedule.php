@@ -1,4 +1,7 @@
-<?php include('include/header.php'); ?>
+<?php 
+session_start();
+require_once('include/header.php'); 
+?>
 
         <!-- end header section -->
     </div>

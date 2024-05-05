@@ -69,7 +69,7 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="navbar-nav ">
-                <li class="nav-item active">
+                <li class="nav-item ">
                   <a class="nav-link" href="indexLogin.php">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
@@ -84,9 +84,7 @@
                 <li class="nav-item">
                   <a class="nav-link" href="donations.php">Donations</a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="alert.php">Alerts</a>
-                </li>
+               
                 <li class="nav-item">
                   <a class="nav-link" href="UserProfile-read.php">User Profile</a>
                 </li>

@@ -1,10 +1,13 @@
-<?php include('include/header.php'); ?>
+<?php 
+session_start();
+require_once('include/header.php'); 
+?>
 
 <!-- end header section -->
 </div>
 
 <?php
-session_start();
+
 // Get user ID
 require_once('../Database/database.php');
 $UserID = $_SESSION["UserID"];
@@ -44,7 +47,7 @@ if (!$result) {
         ?>
         <div class="col-md-4">
             <div class="card">
-                <img class="card-img-top" src="../Committee/images/donations/<?php echo $image; ?>" alt="<?php echo $DonationName; ?>" >
+                 <img class="card-img-top" src="../Committee/images/donations/<?php echo $image; ?>" alt="<?php echo $DonationName; ?>" >
                 <div class="card-body">
                     <h5 class="card-title"><?php echo htmlspecialchars($DonationName); ?></h5>
                     <p class="card-text"><?php echo htmlspecialchars($DonationDesc); ?></p>
