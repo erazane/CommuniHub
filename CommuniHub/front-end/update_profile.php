@@ -63,11 +63,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Redirect back to the profile page with a success message
+        $_SESSION['profile_status'] = "Profile updated successfully!";
+        $_SESSION['profile_status_code'] = "success";
         header('Location: UserProfile-read.php?success=1');
         exit();
     } else {
         // Redirect back to the profile page with an error message
+        $_SESSION['profile_status'] = "Profile cannot be updated";
+        $_SESSION['profile_status_code'] = "error";
         header('Location: UserProfile-read.php?error=1');
+
         exit();
     }
 } else {

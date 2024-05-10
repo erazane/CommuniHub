@@ -123,6 +123,40 @@ if(isset($_SESSION['status']) && $_SESSION['status'] !='')
 }
 ?>
 
+<script>
+<?php
+if(isset($_SESSION['profile_status']) && $_SESSION['profile_status_code'] !='') {
+?>
+    swal({
+        title: '<?php echo $_SESSION['profile_status'];?>',
+        icon: '<?php echo $_SESSION['profile_status_code'];?>',
+        button: "Confirm",
+    });
+<?php
+    unset($_SESSION['profile_status']);
+    unset($_SESSION['profile_status_code']);
+}
+?>
+</script>
+
+<script>
+<?php
+if(isset($_SESSION['password_status']) && $_SESSION['password_status_code'] !='') {
+?>
+  console.log("Swal available")
+    swal({
+        title: '<?php echo $_SESSION['password_status'];?>',
+        icon: '<?php echo $_SESSION['password_status_code'];?>',
+        button: "Confirm",
+    });
+    console.log("Swal clciked")
+<?php
+    unset($_SESSION['password_status']);
+    unset($_SESSION['password_status_code']);
+}
+?>
+</script>
+
 </body>
 
 </html>

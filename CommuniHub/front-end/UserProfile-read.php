@@ -2,17 +2,35 @@
 session_start();
 require_once('include/header.php'); 
 ?>
+<!-- end header section -->
+</div>
 
-    <!-- end header section -->
-  </div>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
 
 
 
 <!-- User Profile Form -->
 
 <?php
+require_once ('../Database/database.php');
+
+    if (isset($_SESSION['password_status']) && isset($_SESSION['password_status_code'])) {
+      // Display success message using SweetAlert
+      echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['password_status']) . '", "' . htmlspecialchars($_SESSION['password_status_code']) . '");</script>';
+      // Unset the session variables
+      unset($_SESSION['password_status']);
+      unset($_SESSION['password_status_code']);
+    }
     
-    require_once ('../Database/database.php');
+    if (isset($_SESSION['profile_status']) && isset($_SESSION['profile_status_code'])) {
+      echo '<script>swal("Profile Update!", "' . htmlspecialchars($_SESSION['profile_status']) . '", "' . htmlspecialchars($_SESSION['profile_status_code']) . '");</script>';
+      // Unset the session variables
+      unset($_SESSION['profile_status']);
+      unset($_SESSION['profile_status_code']);
+    }
+
+    
     // Get user ID
     $UserID = $_SESSION["UserID"];
 
@@ -46,7 +64,7 @@ require_once('include/header.php');
 <section class="service_section layout_padding wider_section">
   <div class="container">
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-6">
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">
@@ -70,6 +88,9 @@ require_once('include/header.php');
                   <div class="form-group">
                     <p><strong>Martial Status:</strong> <?php echo isset($UserMartialStatus) ? $UserMartialStatus : ''; ?></p>
                   </div>
+                  <div class="form-group">
+                    <p><strong>Age:</strong> <?php echo isset($UserAge) ? $UserAge : ''; ?></p>
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
@@ -90,9 +111,13 @@ require_once('include/header.php');
 
             <div class="text-center">
              <!-- Button trigger modal -->
-             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editProfileModal">
+             <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#editProfileModal">
                 Edit Profile
               </button>
+               <!-- Button trigger modal -->
+               <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#editPasswordModal">
+                    Change Password
+                </button>
               <!-- Modal -->
               <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalTitle" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document"> <!-- Adjusted modal-dialog class -->
@@ -109,7 +134,7 @@ require_once('include/header.php');
                           <div class="row justify-content-center">
                             <div class="col-md-10"> <!-- Adjusted column width for form -->
                               <div class="user_profile_container">
-                                <form action="update_profile.php" method="POST" enctype="multipart/form-data"> <!-- Action to handle profile updates -->
+                                <form action="update_profile.php" method="POST" enctype="multipart/form-data"> 
                                   <div class="form-group">
                                     <label for="first_name">First Name:</label>
                                     <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo $UserFirstName ?>" required>
@@ -137,15 +162,15 @@ require_once('include/header.php');
                                       </select>
                                   </div>
                                   <div class="form-group">
-                                    <label for="first_name">Age:</label>
-                                    <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo $UserFirstName ?>" required>
+                                    <label for="Age">Age:</label>
+                                    <input type="text" class="form-control" id="age" name="age" value="<?php echo $UserAge?>" required>
                                   </div>
                                   <div class="form-group">
-                                    <label for="first_name">Contact Details:</label>
+                                    <label for="contact_details">Contact Details:</label>
                                      <input type="text" class="form-control" id="contact_details" name="contact_details" value="<?php if (isset($UserContactDetails)) echo $UserContactDetails; ?>" required>
                                   </div>
                                   <div class="form-group">
-                                    <label for="first_name">Email:</label>
+                                    <label for="UserEmail">Email:</label>
                                     <input type="text" class="form-control" id="UserEmail" name="UserEmail" value="<?php if (isset($UserEmail)) echo $UserEmail; ?>" required>
                                   </div>
                                   <div class="form-group">
@@ -174,72 +199,77 @@ require_once('include/header.php');
                 // Function to submit the form data
                 function submitForm() {
                   // Submit the form
-                  $('form').submit();
+                  $('#editProfileModal form').submit();
                 }
               </script>
+            </div>
+            <!-- end modal -->
 
-
-              <!-- end modal -->
-              <!-- change password modal -->
-              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePasswordModal">
-                Change Password
-              </button>
-              <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalTitle" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Change Password</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <div class="container" style="border: solid black 1px;">
-                        <div class="row">
-                        <div class="col-md-6"> <!-- Adjusted column width for form -->
-                              <div class="user_profile_container">
-                                <form action="update_password.php" method="POST" enctype="multipart/form-data"> 
-                                  <div class="form-group">
-                                      <label for="current-password">Current Password:</label>
-                                      <input type="text" class="form-control" id="current-password" name="current-password" value="<?php echo $UserFirstName ?>" required>
+           <!-- start password modal -->
+            <div class="text-center">
+                
+                <!-- Modal -->
+                <div class="modal fade" id="editPasswordModal" tabindex="-1" role="dialog" aria-labelledby="editPasswordModalTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document"> <!-- Adjusted modal-dialog class -->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editPasswordModalTitle">Change Password</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <section class="user_profile_section layout_padding">
+                                    <div class="container">
+                                        <div class="row justify-content-center">
+                                            <div class="col-md-10"> <!-- Adjusted column width for form -->
+                                                <div class="user_profile_container">
+                                                    <form action="update-password.php" method="POST" enctype="multipart/form-data"> 
+                                                        <div class="form-group">
+                                                            <label for="currentPassword">Current Password:</label>
+                                                            <input type="password" class="form-control" id="currentPassword" name="currentPassword" value="<?php if(isset($currentPassword)) ?>" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="newPassword">New Password:</label>
+                                                            <input type="password" class="form-control" id="newPassword" name="newPassword" value="<?php if (isset($newPassword))  ?>" required>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="confirmPassword">Confirm Password:</label>
+                                                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" value="<?php if (isset($confirmPassword)) ?>" required>
+                                                        </div>
+                                                        <!-- Hidden input field to send user ID for updating -->
+                                                        <input type="hidden" name="user_id" value="<?php echo $UserID; ?>">
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                    <label for="Updated-password">New Password:</label>
-                                    <input type="text" class="form-control" id="Updated-password" name="Updated-password" value="<?php echo $UserFirstName ?>" required>
-                                  </div>
-                                  <div class="form-group">
-                                    <label for="Confirm-password">Confirm Password:</label>
-                                    <input type="text" class="form-control" id="Confirm-password" name="Confirm-password" value="<?php echo $UserFirstName ?>" required>
-                                  </div>
-                                </form>
-                              </div>
+                                </section>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary" onclick="submitPasswordForm()">Save changes</button>
+                            </div>
                         </div>
-                        </div>
-                      </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                      </div>
-
-                      <script>
-                        // Function to submit the form data
-                        function submitForm() {
-                          // Submit the form
-                          $('form').submit();
-                        }
-                      </script>
-
                     </div>
-                  </div>
                 </div>
             </div>
+            </div>
+                
+            <script>
+                function submitPasswordForm() {
+                    // $('#editProfileModal form').submit();
+                    $('#editPasswordModal form').submit();
+                }
+            </script>
 
-
+            <!-- end password modal  -->
+           
+    
           </div>
         </div>
-      </div>
-      <div class="col-md-8">
+      
+      <div class="col-md-6">
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">
