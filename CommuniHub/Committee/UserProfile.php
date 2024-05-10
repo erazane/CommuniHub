@@ -21,23 +21,15 @@ require_once ('../Database/database.php');
       // Unset the session variables
       unset($_SESSION['password_status']);
       unset($_SESSION['password_status_code']);
-    // } else {
-    //   // Display error message for password not set correctly
-    //   echo '<script>swal("Error!", "Password not set correctly.", "error");</script>';
     }
-
-    // Check if profile status session variables are set
+    
     if (isset($_SESSION['profile_status']) && isset($_SESSION['profile_status_code'])) {
-      // Display success message using SweetAlert
       echo '<script>swal("Profile Update!", "' . htmlspecialchars($_SESSION['profile_status']) . '", "' . htmlspecialchars($_SESSION['profile_status_code']) . '");</script>';
       // Unset the session variables
       unset($_SESSION['profile_status']);
       unset($_SESSION['profile_status_code']);
-    // } else {
-    //   // Display error message for data cannot be inserted
-    //   echo '<script>swal("Error!", "Data cannot be inserted.", "error");</script>';
     }
-  
+
     
     // Get user ID
     $UserID = $_SESSION["UserID"];
@@ -67,34 +59,9 @@ require_once ('../Database/database.php');
         // header('Location: UserProfile.php');
         exit();
     }
-
-    $query = "SELECT COUNT(*) AS activity_count FROM activitiesJoined WHERE UserID = $UserID";
-    $result = mysqli_query($dbc, $query);
-
-    if($result){
-      $row = mysqli_fetch_assoc($result);
-       $activityCount=$row['activity_count'];
-    }else{
-      $activityCount = 0;  //setting default is zero
-    }
-
-    $query = "SELECT COUNT(*) AS history_count
-    FROM activities a
-    JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID
-    WHERE aj.UserID = $UserID
-    AND a.Status = 'Completed'";
-
-    $result = mysqli_query($dbc, $query);
-
-    if($result){
-      $row = mysqli_fetch_assoc($result);
-       $history_count=$row['history_count'];
-    }else{
-      $history_count = 0;  //setting default is zero
-    }
-
 ?>
-
+<br>
+<br>
 <section class="service_section layout_padding wider_section">
   <div class="container">
     <div class="row">
@@ -103,48 +70,47 @@ require_once ('../Database/database.php');
           <div class="card-body">
             <div class="heading_container heading_center">
               <h2 class="text-center mb-4">User Profile</h2>
-              
             </div>
 
             <!-- Display uploaded profile picture -->
-            <div class="profile_picture_container text-center mb-4" style="padding: 10%;">
-            <img src="images/profile-picture/<?php echo $row['image'] ? $row['image'] : "default_profile_picture.png"; ?>" alt="Profile Picture" style="max-width: 250px; max-height:250px;" class="img-fluid rounded-circle">
+            <div class="profile_picture_container text-center mb-4">
+            <img src="images/profile-picture/<?php echo $row['image'] ? $row['image'] : "default_profile_picture.png"; ?>" alt="Profile Picture" style="max-width: 200px; max-height:200px" class="img-fluid rounded-circle">
             </div>
 
-            <div class="container" style="padding: 2%;"> 
-              <div class="row " style="padding: 2%; border:1px solid black">
-                <div class="col-md-6" style="padding: 4%;">
-                  <div class="form-group" style="padding: 1px;">
+            <div class="container"> 
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
                     <p><strong>First Name:</strong> <?php echo isset($UserFirstName) ? $UserFirstName : ''; ?></p>
                   </div>
-                  <div class="form-group" style="padding: 1px;">
+                  <div class="form-group">
                     <p><strong>Username:</strong> <?php echo isset($UserUserName) ? $UserUserName : ''; ?></p>
                   </div>
-                  <div class="form-group" style="padding: 1px;">
+                  <div class="form-group">
                     <p><strong>Martial Status:</strong> <?php echo isset($UserMartialStatus) ? $UserMartialStatus : ''; ?></p>
                   </div>
-                  <div class="form-group" style="padding: 1px;">
+                  <div class="form-group">
                     <p><strong>Age:</strong> <?php echo isset($UserAge) ? $UserAge : ''; ?></p>
                   </div>
                 </div>
-                <div class="col-md-6" style="padding: 2%;">
-                  <div class="form-group" style="padding: 1px;">
+                <div class="col-md-6">
+                  <div class="form-group">
                     <p><strong>Last Name:</strong> <?php echo isset($UserLastName) ? $UserLastName : ''; ?></p>
                   </div>
-                  <div class="form-group" style="padding: 1px;">
+                  <div class="form-group">
                     <p><strong>Occupation:</strong> <?php echo isset($UserOccupation) ? $UserOccupation : ''; ?></p>
                   </div>
-                  <div class="form-group" style="padding: 1px;">
+                  <div class="form-group">
                     <p><strong>Contact Details:</strong> <?php echo isset($UserContactDetails) ? $UserContactDetails : ''; ?></p>
                   </div>
-                  <div class="form-group" style="padding: 1px;">
+                  <div class="form-group">
                     <p><strong>Email:</strong> <?php echo isset($UserEmail) ? $UserEmail : ''; ?></p>
                   </div>
                 </div>
               </div>
             </div>
-            <br>
-            <div class="text-center md-2">
+
+            <div class="text-center">
              <!-- Button trigger modal -->
              <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#editProfileModal">
                 Edit Profile
@@ -169,7 +135,7 @@ require_once ('../Database/database.php');
                           <div class="row justify-content-center">
                             <div class="col-md-10"> <!-- Adjusted column width for form -->
                               <div class="user_profile_container">
-                                <form action="update_profile.php" method="POST" enctype="multipart/form-data"> 
+                                <form action="update-profile.php" method="POST" enctype="multipart/form-data"> 
                                   <div class="form-group">
                                     <label for="first_name">First Name:</label>
                                     <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo $UserFirstName ?>" required>
@@ -308,34 +274,9 @@ require_once ('../Database/database.php');
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">
-              <h2 class="text-center mb-4">Activity History</h2>
+              <h2 class="text-center mb-4">Activities Joined</h2>
             </div>
-            <div class="card" style="width: 32rem;">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                  <a href="activities-joined.php">
-                  <i class="fa fa-bookmark" aria-hidden="true"></i>
-                    Upcoming Activities
-                  </a>
-                  <div class="card" style="float: right; padding: 10px;">
-                    
-                    <span><?php echo $activityCount; ?></span>
-                  </div>
-                </li>
-
-                <li class="list-group-item">
-                  <a href="activity-history.php">
-                  <i class="fa fa-history" aria-hidden="true"></i>
-                    History
-                  </a>
-                  <div class="card" style="float: right; padding: 10px;">
-                    
-                    <span><?php echo $history_count; ?></span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
+            <p class="text-center">Display number of activities joined</p>
           </div>
         </div>
         <div class="card mb-3">
@@ -343,21 +284,7 @@ require_once ('../Database/database.php');
             <div class="heading_container heading_center">
               <h2 class="text-center mb-4">Donations Made</h2>
             </div>
-            <div class="card" style="width: 32rem;">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                  <a href="activities-joined.php">
-                  <i class="fa fa-history" aria-hidden="true"></i>
-                    History
-                  </a>
-                  <div class="card" style="float: right; padding: 10px;">
-                    <span>6</span>
-                    <!-- <span><?php echo $activityCount; ?></span> -->
-                  </div>
-                </li>
-                </li>
-              </ul>
-            </div>
+            <p class="text-center">Display number of donations made</p>
           </div>
         </div>
         <div class="card mb-3">
@@ -365,32 +292,7 @@ require_once ('../Database/database.php');
             <div class="heading_container heading_center">  
               <h2 class="text-center mb-4">Complaints</h2>
             </div>
-            <div class="card" style="width: 32rem;">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                  <a href="activities-joined.php">
-                  <i class="fa fa-clock-o" aria-hidden="true"></i>
-                    Pending Complaints
-                  </a>
-                  <div class="card" style="float: right; padding: 10px;">
-                    <span>6</span>
-                    <!-- <span><?php echo $activityCount; ?></span> -->
-                  </div>
-                </li>
-
-                <li class="list-group-item">
-                  <a href="activities-joined.php">
-                  <i class="fa fa-history" aria-hidden="true"></i>
-                    History
-                  </a>
-                  <div class="card" style="float: right; padding: 10px;">
-                    <span>6</span>
-                    <!-- <span><?php echo $activityCount; ?></span> -->
-                  </div>
-                </li>
-
-              </ul>
-            </div>
+            <p class="text-center">Display number of complaints</p>
           </div>
         </div>
       </div>
