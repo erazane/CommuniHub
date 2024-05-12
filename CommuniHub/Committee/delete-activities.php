@@ -27,7 +27,7 @@ if(isset($_GET['ActivityID'])) {
 unset($_SESSION['delete']);
 unset($_SESSION['delete_data']);
 
-// Redirect back to the manage-donation.php page
+// Redirect back to the manage-activity.php page
 header("Location: manage-activities.php");
 exit();
 ?>

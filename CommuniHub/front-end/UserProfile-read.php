@@ -15,10 +15,11 @@ require_once('include/header.php');
 <?php
 require_once ('../Database/database.php');
 
+
+// }
+
     if (isset($_SESSION['password_status']) && isset($_SESSION['password_status_code'])) {
-      // Display success message using SweetAlert
       echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['password_status']) . '", "' . htmlspecialchars($_SESSION['password_status_code']) . '");</script>';
-      // Unset the session variables
       unset($_SESSION['password_status']);
       unset($_SESSION['password_status_code']);
     // } else {
@@ -28,9 +29,7 @@ require_once ('../Database/database.php');
 
     // Check if profile status session variables are set
     if (isset($_SESSION['profile_status']) && isset($_SESSION['profile_status_code'])) {
-      // Display success message using SweetAlert
       echo '<script>swal("Profile Update!", "' . htmlspecialchars($_SESSION['profile_status']) . '", "' . htmlspecialchars($_SESSION['profile_status_code']) . '");</script>';
-      // Unset the session variables
       unset($_SESSION['profile_status']);
       unset($_SESSION['profile_status_code']);
     // } else {
@@ -41,32 +40,6 @@ require_once ('../Database/database.php');
     
     // Get user ID
     $UserID = $_SESSION["UserID"];
-
-    // Query to fetch user information
-    $query = "SELECT * FROM user WHERE UserID = '$UserID'";
-    $result = @mysqli_query($dbc, $query);
-
-    // Check if the query executed successfully
-    if ($result && mysqli_num_rows($result) == 1) {
-        // Fetch user information
-        $row = mysqli_fetch_assoc($result);
-        $profileImage = $row["UserImg"];
-        $UserFirstName = $row['UserFirstName'];
-        $UserLastName = $row['UserLastName'];
-        $UserUserName = $row['UserUserName'];
-        $UserPwd = $row['UserPwd'];
-        $UserAge = $row['UserAge'];
-        $UserMartialStatus = $row['UserMartialStatus'];
-        $UserOccupation = $row['UserOccupation'];
-        $UserContactDetails = $row['UserContactDetails'];
-        $UserEmail = $row['UserEmail'];
-        $image = $row['image'];
-
-    } else {
-        // Redirect or show error message if no data found
-        // header('Location: UserProfile.php');
-        exit();
-    }
 
     $query = "SELECT COUNT(*) AS activity_count FROM activitiesJoined WHERE UserID = $UserID";
     $result = mysqli_query($dbc, $query);
@@ -93,6 +66,32 @@ require_once ('../Database/database.php');
       $history_count = 0;  //setting default is zero
     }
 
+    // Query to fetch user information
+    $query = "SELECT * FROM user WHERE UserID = '$UserID'";
+    $result = @mysqli_query($dbc, $query);
+
+    // Check if the query executed successfully
+    if ($result && mysqli_num_rows($result) == 1) {
+        // Fetch user information
+        $row = mysqli_fetch_assoc($result);
+        $profileImage = $row["UserImg"];
+        $UserFirstName = $row['UserFirstName'];
+        $UserLastName = $row['UserLastName'];
+        $UserUserName = $row['UserUserName'];
+        $UserPwd = $row['UserPwd'];
+        $UserAge = $row['UserAge'];
+        $UserMartialStatus = $row['UserMartialStatus'];
+        $UserOccupation = $row['UserOccupation'];
+        $UserContactDetails = $row['UserContactDetails'];
+        $UserEmail = $row['UserEmail'];
+        $image = $row['image'];
+
+    } else {
+        exit();
+    }
+
+   
+
 ?>
 
 <section class="service_section layout_padding wider_section">
@@ -111,35 +110,51 @@ require_once ('../Database/database.php');
             <img src="images/profile-picture/<?php echo $row['image'] ? $row['image'] : "default_profile_picture.png"; ?>" alt="Profile Picture" style="max-width: 250px; max-height:250px;" class="img-fluid rounded-circle">
             </div>
 
-            <div class="container" style="padding: 2%;"> 
-              <div class="row " style="padding: 2%; border:1px solid black">
-                <div class="col-md-6" style="padding: 4%;">
+            <div class="card" style="padding: 2%;">
+              <div class="row" style="padding: 2%; ">
+                <div class="col-md-6" style="padding: 2%;">
+                <div class="card" >
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>First Name:</strong> <?php echo isset($UserFirstName) ? $UserFirstName : ''; ?></p>
                   </div>
+                </div>
+                <div class="card">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Username:</strong> <?php echo isset($UserUserName) ? $UserUserName : ''; ?></p>
                   </div>
+                </div>
+                <div class="card">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Martial Status:</strong> <?php echo isset($UserMartialStatus) ? $UserMartialStatus : ''; ?></p>
                   </div>
+                </div>
+                <div class="card">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Age:</strong> <?php echo isset($UserAge) ? $UserAge : ''; ?></p>
                   </div>
                 </div>
+                </div>
                 <div class="col-md-6" style="padding: 2%;">
+                <div class="card ">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Last Name:</strong> <?php echo isset($UserLastName) ? $UserLastName : ''; ?></p>
                   </div>
+                </div>
+                <div class="card">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Occupation:</strong> <?php echo isset($UserOccupation) ? $UserOccupation : ''; ?></p>
                   </div>
+                </div>
+                <div class="card">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Contact Details:</strong> <?php echo isset($UserContactDetails) ? $UserContactDetails : ''; ?></p>
                   </div>
+                </div>
+                <div class="card">
                   <div class="form-group" style="padding: 1px;">
                     <p><strong>Email:</strong> <?php echo isset($UserEmail) ? $UserEmail : ''; ?></p>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -310,10 +325,11 @@ require_once ('../Database/database.php');
             <div class="heading_container heading_center">
               <h2 class="text-center mb-4">Activity History</h2>
             </div>
-            <div class="card" style="width: 32rem;">
+            <div class="card">
+              <div class="col-md-12">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                  <a href="activities-joined.php">
+                  <a href="activities-joined.php" >
                   <i class="fa fa-bookmark" aria-hidden="true"></i>
                     Upcoming Activities
                   </a>
@@ -335,6 +351,7 @@ require_once ('../Database/database.php');
                 </li>
               </ul>
             </div>
+            </div>
 
           </div>
         </div>
@@ -343,7 +360,8 @@ require_once ('../Database/database.php');
             <div class="heading_container heading_center">
               <h2 class="text-center mb-4">Donations Made</h2>
             </div>
-            <div class="card" style="width: 32rem;">
+            <div class="card">
+              <div class="col-md-12">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                   <a href="activities-joined.php">
@@ -358,6 +376,7 @@ require_once ('../Database/database.php');
                 </li>
               </ul>
             </div>
+            </div>
           </div>
         </div>
         <div class="card mb-3">
@@ -365,7 +384,8 @@ require_once ('../Database/database.php');
             <div class="heading_container heading_center">  
               <h2 class="text-center mb-4">Complaints</h2>
             </div>
-            <div class="card" style="width: 32rem;">
+            <div class="card">
+              <div class="col-md-12">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">
                   <a href="activities-joined.php">
@@ -390,6 +410,7 @@ require_once ('../Database/database.php');
                 </li>
 
               </ul>
+            </div>
             </div>
           </div>
         </div>
