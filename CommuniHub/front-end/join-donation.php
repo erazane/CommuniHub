@@ -2,14 +2,13 @@
 session_start();
 require_once('include/header.php'); 
 ?>
-
+</div>
     <!-- start donation form -->
 
     <!-- start php -->
 
     <?php
         // error_reporting(E_ALL);
-        session_start();
         require_once ('../Database/database.php');
         
         // Retrieve from URL parameter
@@ -38,28 +37,59 @@ require_once('include/header.php');
         } else {
             echo "Error: " . mysqli_error($dbc);
         }
+
+    //retrive the description and image for the summary page
+    $query ="SELECT DonationDesc,image,DonationName FROM donation WHERE DonationID=$DonationID ";
+    $result= mysqli_query($dbc,$query);
+
+    if($result && mysqli_num_rows($result)){
+        //fetch the description
+        $row =mysqli_fetch_assoc($result);
+        $DonationDesc = isset($row['DonationDesc']) ? $row['DonationDesc'] : ''; 
+        $image = isset($row['image']) ? $row['image'] : '';
+        $DonationName = isset($row['DonationName']) ? $row['DonationName'] : '';
+
+    }
+
     ?>
 
 
     <!-- end php -->
 
     <section class="service_section layout_padding">
-        <div class="container">
-            <div class="heading_container heading_center">
-                <h2>Make a Difference Today</h2>
-                <p class="text-card">
-                    Ensure that your community has everything it needs to maintain a peaceful way of life.
-                </p>
-            </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 mx-auto" style="max-width: 800px;">
-                    <div class="card">
-                    <div class="card bg-dark text-black" style="font-weight: bolder;">
-                        <img class="card-img" 
-                        src="https://media.istockphoto.com/id/182386857/photo/row-of-paper-people.jpg?s=612x612&w=0&k=20&c=ZBWK0LbKok3acZ5-NIXO3-pHW58pujorsSS5KBEte98=" 
-                        alt="Card image">
+    <div class="container" style="max-width: 1200px ; padding :2%";>
+    <div class="heading_container heading_center">
+            <h2>Payment Details</h2>
+            
+        </div>
+        <div class="row">
+            <!-- Left card section for user details -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="text-center">
+                         <h4 class="card-header"><?php echo isset($DonationName) ? $DonationName : '' ;?></h4>
+                    </div>
+                        <div class="card-body">
+                        <!-- <img class="card-img-top" src="<?php echo isset($image) ? $image : 'placeholder_image_url.jpg'; ?>" alt="Image"> -->
+                        <img class="card-img-top" src="../Committee/images/donations/<?php echo $image; ?>" alt="<?php echo $DonationName; ?>" >
+                          <br><br>  
+                            
+                        <div class="intro-text" style="padding: 2%;">
+                                 <h3 style="font-weight: bold;">
+                                    Thank you for considering a donation to our cause.<br>
+                                    Below, you'll find more details about the specific donation you've selected:
+                                    </h3>
+                            </div>
+                            <div class="card-body">
+                            <p class="card-text" style="text-align: justify;"><?php echo isset($DonationDesc) ? $DonationDesc : '' ;?></p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right card  -->
+            <div class="col-md-4 mx-auto" style="max-width: 800px;">
+                    <div class="card">
                         <div class="card-body">
                     <form action="#" method="POST" enctype="multipart/form-data">
                         <h4><strong>Fill out the form below to support the cause with your generous donation. </strong></h4>
@@ -78,28 +108,30 @@ require_once('include/header.php');
                         </div>
                         <div class="form-group">
                             <label for="UserContactDetails">Contact Detail:</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa fa-phone" aria-hidden="true"></i></span>
+                                </div>
                             <input type="text" class="form-control" id="UserContactDetails" name="UserContactDetails" value="<?php echo $UserContactDetails; ?>"required>
                         </div>
                         <div class="form-group">
                             <label for="DonationTotal">Donation Amount:</label>
-                            <select class="form-control" id="DonationTotal" name="DonationTotal">
-                                <option value="" disabled selected>Select Amount</option>
-                                <option value="10">RM 10</option>
-                                <option value="30">RM 30</option>
-                                <option value="50">RM 50</option>
-                                <option value="100">RM 100</option>
-                                <option value="150">RM 150</option>
-                            </select>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">RM</span>
+                                </div>
+                             <input type="text" class="form-control" id="DonationTotal" name="DonationTotal" placeholder="Enter Amount">
                         </div>
 
                         <div class="form-group">
                             <label for="DonationMessage">Message:</label>
-                            <textarea class="form-control" id="DonationMessage" name="DonationMessage" rows="3"></textarea>
+                            <textarea class="form-control" id="DonationMessage" name="DonationMessage" rows="7" placeholder="Optional"></textarea>
                         </div>
                         <!-- <div class="form-group">
                             <label for="DonationImage">Upload receipt:</label>
                             <input type="file" class="form-control-file" id="DonationImage" name="DonationImage" accept="image/*">
                         </div> -->
+                        <hr>
                         <div class="text-right">
                              <a href="donations.php" onclick="confirmJoin();" class="btn btn-primary btn-lg ">Back</a>
                              <a href="#" onclick="confirmJoin();" class="btn btn-primary btn-lg ">Join</a>
@@ -172,9 +204,9 @@ require_once('include/header.php');
                 </div>
             </div>
             </div>
-          </div>
         </div>
-    </section>
+      </section>
+</div>
 
     <!-- end form -->
 

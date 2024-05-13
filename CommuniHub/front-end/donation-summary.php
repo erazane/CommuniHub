@@ -1,11 +1,13 @@
-<?php include('include/header.php'); ?>
+<?php include('include/header.php');
+session_start();
+ ?>
+
 
     <!-- end header section -->
   </div>
 
 <!-- start php -->
 <?php
-session_start();
 require_once('../Database/database.php');
 
 //retrieve the UserID from the Url
@@ -76,25 +78,91 @@ if(!isset($_SESSION[$UserID])){
             <div class="col-md-8">
                 <div class="card">
                     <div class="text-center">
-                         <h4 class="card-header"><?php echo isset($DonationName) ? $DonationName : '' ;?></h4>
+                         <h4 class="card-header">Payment </h4>
                     </div>
                         <div class="card-body">
-                        <!-- <img class="card-img-top" src="<?php echo isset($image) ? $image : 'placeholder_image_url.jpg'; ?>" alt="Image"> -->
-                        <img class="card-img-top" src="../Committee/images/donations/<?php echo $image; ?>" alt="<?php echo $DonationName; ?>" >
-                          <br><br>  
+                        <<form action="#" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                            <div class="container">
+                                <h3>Card Details</h3>
+                                <div class="form-group">
+                                    <label for="CardHolder">Name on card :</label>
+                                        <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa fa-user" aria-hidden="true"></i></span>
+                                        </div>
+                                    <input type="text" class="form-control" id="CardHolder" name="CardHolder">
+                                </div>
+                                </div>
+                                <label for="cardType">Payment Type :</label>
+                                <div class="card-buttons">
+                                    <label class="card-label" style="padding: 2%;">
+                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
+                                            <input type="radio" name="cardType" value="visa">
+                                            <img src="../front-end/images/payment types/visa.png" alt="Visa Card" style="max-width: 100px; max-height: 60px;">
+                                        <!-- </div> -->
+                                    </label>
+
+                                    <label class="card-label" style="padding: 2%;">
+                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
+                                            <input type="radio" name="cardType" value="mastercard">
+                                            <img src="../front-end/images/payment types/mastercard.png" alt="Mastercard Card" style="max-width: 80px; max-height: px;">
+                                        <!-- </div> -->
+                                    </label>
+
+                                    <label class="card-label" style="padding: 2%;">
+                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
+                                            <input type="radio" name="cardType" value="tng">
+                                            <img src="../front-end/images/payment types/tng.png" alt="Touch and Go wallet" style="max-width: 100px; max-height: 60px;">
+                                        <!-- </div> -->
+                                    </label>
+
+                                    <label class="card-label" style="padding: 2%;">
+                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
+                                            <input type="radio" name="cardType" value="grab">
+                                            <img src="../front-end/images/payment types/grab.png" alt="Grab Wallet" style="max-width: 100px; max-height: 60px;">
+                                        <!-- </div> -->
+                                    </label>
+                                </div>
+
+                                    <div class="form-group">
+                                        <label for="CardDetails"> Card Number :</label>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa fa-credit-card-alt" aria-hidden="true"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="CardNumber" name="CardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" pattern="\d{16}" title="Please enter a 16-digit card number" inputmode="numeric">
+                                        </div>
+                                    </div>
+
+
+
+                                <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for="month">Expiry Date :</label>
+                                            <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                                            </div>
+                                        <input type="date" class="form-control" id="CardHolder" name="CardHolder" placeholder="MM/YY">
+                                    </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-md-offset-2">
+                                    <div class="form-group">
+                                        <label for="CVV">CVV :</label>
+                                        <input type="text" class="form-control" id="CardHolder" name="CardHolder" placeholder="***">
+                                    </div>
+                                    </div>
+                                </div> 
+                                </div>
                             
-                        <div class="intro-text" style="padding: 2%;">
-                                 <h3 style="font-weight: bold;">
-                                    Thank you for considering a donation to our cause.<br>
-                                    Below, you'll find more details about the specific donation you've selected:
-                                    </h3>
                             </div>
-                            <div class="card-body">
-                            <p class="card-text" style="text-align: justify;"><?php echo isset($DonationDesc) ? $DonationDesc : '' ;?></p>
                         </div>
                     </div>
-                </div>
             </div>
+
 
             <!-- Right card section for payment options (placeholder) -->
             <div class="col-md-4">
@@ -139,22 +207,9 @@ if(!isset($_SESSION[$UserID])){
                     </div>
                 </div>
                 <br>
-                <div class="card">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card-header text-center">
-                            <h4>Join Other Donations</h4>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">Special title treatment</h5>
-                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
-                        </div>
-                    </div>
-                </div>
-                </div>
+               
              </div>
-        </div>
+            </div>
       </section>
 </div>
 
