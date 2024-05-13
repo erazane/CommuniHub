@@ -131,7 +131,7 @@ if(!isset($_SESSION[$UserID])){
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa fa-credit-card-alt" aria-hidden="true"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="CardNumber" name="CardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" pattern="\d{16}" title="Please enter a 16-digit card number" inputmode="numeric">
+                                            <input type="text" class="form-control" id="CardNumber" name="CardNumber" placeholder="XXXX-XXXX-XXXX-XXXX" pattern="[0-9]" title="Please enter a 16-digit card number" maxlength="16">
                                         </div>
                                     </div>
 
