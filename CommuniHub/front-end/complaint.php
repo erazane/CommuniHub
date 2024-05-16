@@ -78,3 +78,5 @@ require_once('include/header.php');
 </body>
 
 </html>
+
+<?php include('include/footer.php'); ?>

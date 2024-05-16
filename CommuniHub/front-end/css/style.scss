@@ -810,25 +810,4 @@ a:focus {
 
 
 
-.card-buttons {
-  display: flex;
-}
 
-.card-label {
-  margin-right: 10px;
-  cursor: pointer;
-}
-
-.card-label input[type="radio"] {
-  display: none; /* Hide the actual radio buttons */
-}
-
-.card-label img {
-  width: 100px; /* Adjust the size of the card images as needed */
-  height: auto;
-  border: 2px solid transparent; /* Add border to image */
-}
-
-.card-label input[type="radio"]:checked + img {
-  border-color: #007bff; /* Change border color when radio button is checked */
-}
