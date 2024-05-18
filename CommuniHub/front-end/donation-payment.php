@@ -2,18 +2,20 @@
 include('include/header.php');
 session_start();
 
-
-// Check if UserID is set in session, if not, use the one from URL parameter
-if(!isset($_SESSION["UserID"])) {
-    $_SESSION["UserID"] = $UserID; // Set UserID in session if it's not already set
+if (isset($_GET['UserID']) && isset($_GET['DonationID'])) {
+    $UserID = $_GET['UserID'];
+    $DonationID = $_GET['DonationID'];
 }
 
+// Check if UserID is set in session, if not, use the one from URL parameter
+if (!isset($_SESSION["UserID"])) {
+    $_SESSION["UserID"] = $_GET['UserID']; // Set UserID in session if it's not already set
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once('../Database/database.php');
 
-    $UserID = $_POST['UserID'];
-    $DonationID = $_POST['DonationID'];
+
     $DonationTotal = $_POST['DonationTotal'];
     $DonationMessage = $_POST['DonationMessage'];
 
@@ -38,11 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!-- end php -->
-
-
-<!-- start summary -->
-<br>
+<!-- Your HTML content starts here -->
 <div class="container" style="padding: 2%;">
     <div class="heading_container heading_center">
         <h1>Checkout</h1>
@@ -55,51 +53,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="text-center">
                          <h4 class="card-header">Credit/Debit Card Payment </h4>
                     </div>
-                        <div class="card-body">
-                        <form id="paymentdetails" action="receipt.php" method="POST" enctype="multipart/form-data">
-                            <div class="row">
+                    <div class="card-body">
+                        <form id="paymentdetails" method="POST" enctype="multipart/form-data">
+                            <!-- User details hidden fields -->
+                            <input type="hidden" id="UserFirstName" name="UserFirstName" value="<?php echo isset($UserFirstName) ? $UserFirstName : ''; ?>">
+                            <input type="hidden" id="UserLastName" name="UserLastName" value="<?php echo isset($UserLastName) ? $UserLastName : ''; ?>">
+                            <input type="hidden" id="DonationTotal" name="DonationTotal" value="<?php echo isset($DonationTotal) ? $DonationTotal : ''; ?>">
+                            <input type="hidden" id="DonationMessage" name="DonationMessage" value="<?php echo isset($DonationMessage) ? $DonationMessage : ''; ?>">
+
                             <div class="container">
                                 <h3>Card Details</h3>
                                 <div class="form-group">
                                     <label for="CardHolder">Name on card :</label>
-                                        <div class="input-group">
+                                    <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa fa-user" aria-hidden="true"></i></span>
                                         </div>
-                                    <input type="text" class="form-control" id="CardHolder" name="CardHolder" placeholder="Cardholder's Name">
-                                </div>
+                                        <input type="text" class="form-control" id="CardHolder" name="CardHolder" placeholder="Cardholder's Name">
+                                    </div>
                                 </div>
                                 <label for="cardType">Payment Type :</label>
                                 <div class="card-buttons">
                                     <label class="card-label" style="padding: 2%;">
-                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
-                                            <input type="radio" name="cardType" value="visa">
-                                            <img src="../front-end/images/payment types/visa.png" alt="Visa Card" style="max-width: 100px; max-height: 60px;">
-                                        <!-- </div> -->
+                                        <input type="radio" name="cardType" value="visa">
+                                        <img src="../front-end/images/payment types/visa.png" alt="Visa Card" style="max-width: 100px; max-height: 60px;">
                                     </label>
-
                                     <label class="card-label" style="padding: 2%;">
-                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
-                                            <input type="radio" name="cardType" value="mastercard">
-                                            <img src="../front-end/images/payment types/mastercard.png" alt="Mastercard Card" style="max-width: 80px; max-height: px;">
-                                        <!-- </div> -->
+                                        <input type="radio" name="cardType" value="mastercard">
+                                        <img src="../front-end/images/payment types/mastercard.png" alt="Mastercard Card" style="max-width: 80px; max-height: px;">
                                     </label>
-
                                     <label class="card-label" style="padding: 2%;">
-                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
-                                            <input type="radio" name="cardType" value="tng">
-                                            <img src="../front-end/images/payment types/tng.png" alt="Touch and Go wallet" style="max-width: 100px; max-height: 60px;">
-                                        <!-- </div> -->
+                                        <input type="radio" name="cardType" value="tng">
+                                        <img src="../front-end/images/payment types/tng.png" alt="Touch and Go wallet" style="max-width: 100px; max-height: 60px;">
                                     </label>
-
                                     <label class="card-label" style="padding: 2%;">
-                                        <!-- <div class="card" style=" width: 100px; height: 60px;"> -->
-                                            <input type="radio" name="cardType" value="grab">
-                                            <img src="../front-end/images/payment types/grab.png" alt="Grab Wallet" style="max-width: 100px; max-height: 60px;">
-                                        <!-- </div> -->
+                                        <input type="radio" name="cardType" value="grab">
+                                        <img src="../front-end/images/payment types/grab.png" alt="Grab Wallet" style="max-width: 100px; max-height: 60px;">
                                     </label>
                                 </div>
-
                                 <div class="form-group">
                                     <label for="CardNumber"> Card Number :</label>
                                     <div class="input-group">
@@ -109,44 +100,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <input type="text" class="form-control" id="CardNumber" name="CardNumber" placeholder="•••• •••• •••• ••••" maxlength="16" inputmode="numeric">
                                     </div>
                                 </div>
-
-
-
                                 <div class="row">
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label for="expmonth">Expiry Date :</label>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            <label for="expmonth">Expiry Date :</label>
                                             <div class="input-group">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></span>
+                                                </div>
+                                                <input type="date" class="form-control" id="expmonth" name="expmonth" placeholder="MM/YY">
                                             </div>
-                                        <input type="date" class="form-control" id="expmonth" name="expmonth" placeholder="MM/YY">
+                                        </div>
                                     </div>
+                                    <div class="col-md-5 col-md-offset-2">
+                                        <div class="form-group">
+                                            <label for="CVV">CVV :</label>
+                                            <input type="text" class="form-control" id="CVV" name="CVV" placeholder="•••" maxlength="3">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-5 col-md-offset-2">
-                                    <div class="form-group">
-                                        <label for="CVV">CVV :</label>
-                                        <input type="text" class="form-control" id="CVV" name="CVV" placeholder="•••" maxlength="3">
-                                    </div>
-                                    </div>
-                                </div> 
-                                </div>
-                            
+                                <!-- <div class="payment-options">
+                                    <button type="button" onclick="history.back();" class="btn btn-primary btn-lg">Back</button>
+                                    <button type="button" onclick="confirmJoin();" class="btn btn-primary btn-lg">Proceed</button>
+                                </div> -->
                             </div>
-                        </div>
+                        </form>
                     </div>
+                </div>
             </div>
 
-
-            <!-- Right card section for payment options (placeholder) -->
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header text-center">
                         <h4>Summary</h4>
                     </div>
                     <div class="card-body">
-                        
                         <div class="user-details">
                             <br>
                             <div class="form-group">
@@ -173,23 +161,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <strong>Message:</strong>
                                 <span><?php echo isset($DonationMessage) ? $DonationMessage : ''; ?></span>
                             </div>
+
+                            
                         </div>
                         <hr>
-                        
                         <div class="payment-options">
-                        <button type="button" onclick="confirmJoin();" class="btn btn-primary btn-lg">Back</button>
-                        <button type="button" onclick="confirmJoin();" class="btn btn-primary btn-lg">Proceed</button>
-                    </div>
+                                    <button type="button" onclick="history.back();" class="btn btn-primary btn-lg">Back</button>
+                                    <button type="button" onclick="confirmJoin();" class="btn btn-primary btn-lg">Proceed</button>
+                                </div>
                     </div>
                 </div>
                 <br>
-               
-             </div>
             </div>
-      </section>
+        </div>
+    </section>
 </div>
 
-<!-- end summary -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     document.getElementById("CardNumber").addEventListener("input", function(event) {
         let value = event.target.value;
@@ -203,69 +194,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </script>
 
-
 <script>
-                            function confirmJoin() {
-                                console.log("Function called"); // Check if function is being called
-                                // Validate form fields
-                                var CardHolder = document.getElementById("CardHolder").value.trim();
-                                var cardType = document.getElementById("cardType").value.trim();
-                                var CardNumber = document.getElementById("CardNumber").value.trim();
-                                var expmonth = document.getElementById("expmonth").value.trim();
-                                var CVV = document.getElementById("CVV").value.trim();
+    function confirmJoin() {
+        var CardHolder = document.getElementById("CardHolder").value.trim();
+        var CardNumber = document.getElementById("CardNumber").value.trim();
+        var expmonth = document.getElementById("expmonth").value.trim();
+        var CVV = document.getElementById("CVV").value.trim();
+        
+        if (CardHolder === "" || CardNumber === "" || expmonth === "" || CVV === "") {
+            Swal.fire(
+                "Error!",
+                "Please fill out all required fields.",
+                "error"
+            );
+            return; // Stop further execution
+        }
 
-                                console.log(CardHolder, cardType, CardNumber, expmonth, CVV); // Check form field values
+        Swal.fire({
+            title: "Are you sure?",
+            text: "Do you want to proceed with the payment?",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Proceed",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("paymentdetails").submit(); // Submit the form
+                window.location.href = "receipt.php";
+                
+            }
+        });
+    }
+</script>
 
-                                if (CardHolder === "" || cardType === "" || CardNumber === "" || expmonth === "" || CVV === "") {
-                                    // If any of the required fields are empty, show an error message
-                                    swal(
-                                        "Error!",
-                                        "Please fill out all required fields.",
-                                        "error");
-                                    return; // Stop further execution
-                                }
-                                // Check if swal is called
-                                console.log("SweetAlert called");
-                                swal({
-                                    title: "Are you sure?",
-                                    text: "Do you want to proceed with this donation?",
-                                    icon: "info",
-                                    buttons: true,
-                                    dangerMode: true,
-                                }).then((willJoin) => {
-                                console.log("SweetAlert confirmed:", willJoin);
-                                if (willJoin) {
-                                    // If the user confirms, insert data into the donationjoined table
-                                    var UserID = <?php echo json_encode($_SESSION["UserID"]); ?>;
-                                    var DonationID = <?php echo json_encode($_GET["DonationID"]); ?>;
 
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "insert_donation.php",
-                                        data: {
-                                            UserID: UserID,
-                                            DonationID: DonationID,
-                                            DonationTotal: document.getElementById('DonationTotal').value,
-                                            DonationMessage: document.getElementById('DonationMessage').value
-                                        },
-                                        success: function(response) {
-                                            var url = `donation-payment.php?DonationID=${DonationID}&UserID=${UserID}`;
-                                            console.log('Form submitted');
-                                            console.log("Redirecting to:", url);
-                                            window.location.href = url;
-                                        },
-                                        error: function(xhr, status, error) {
-                                            console.error("Error:", error);
-                                        }
-                                    });
-                                } else {
-                                    console.log("User cancelled.");
-                                }
-                            });
-                        }
-                        </script>
-                    
-<!-- end form -->
-<br>
-<br>
 <?php include('include/footer.php'); ?>
+
+
+<!-- var insertdata = {
+                    UserID: "<?php echo $_SESSION['UserID']?>",
+                    DonationID: "<?php echo $_SESSION['DonationID']?>",
+                    DonationTotal: document.getElementById("DonationTotal").value.trim(),
+                    DonationMessage: document.getElementById("DonationMessage").value.trim(),
+                };
+
+                $.ajax({
+                    type: "POST",
+                    url: "insert_donation.php",
+                    data: insertdata,
+                    dataType: "json",
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = "receipt.php";
+                        } else {
+                            Swal.fire(
+                                "Error!",
+                                response.error,
+                                "error"
+                            );
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire(
+                            "Error!",
+                            "An error occurred while processing your request.",
+                            "error"
+                        );
+                    }
+                }); -->
