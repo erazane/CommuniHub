@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa fa-credit-card-alt" aria-hidden="true"></i></span>
                                         </div>
-                                        <input type="text" class="form-control" id="CardNumber" name="CardNumber" placeholder="•••• •••• •••• ••••" maxlength="16" inputmode="numeric">
+                                        <input type="text" class="form-control" id="CardNumber" name="CardNumber" placeholder="•••• •••• •••• ••••" maxlength="16" minlength="16" inputmode="numeric">
                                     </div>
                                 </div>
                                 <div class="row">

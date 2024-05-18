@@ -1,82 +1,178 @@
 <?php 
 session_start();
 require_once('include/header.php'); 
-?>
-  </div>
 
-  <!-- service section -->
-  <section class="service_section layout_padding wider_section">
-    <div class="container" style="max-width: 1500px;">
-        <div class="heading_container heading_center">
-            <h2>Schedule Dashboard</h2>
-            <hr style="width: 350px; text-align: center">
-            <hr>
+function getComplaints() {
+    require_once('../Database/database.php');
+    
+    $sql = "SELECT * FROM complaint ORDER BY created_at DESC";
+    $result = mysqli_query($conn, $sql);
+
+    $complaints = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $complaints[] = $row;
+    }
+
+    return $complaints;
+}
+
+// Display discussions
+function displayComplaints() {
+    $complaints = getComplaints();
+
+    if (empty($complaints)) {
+        echo "No complaints found.";
+        return;
+    }
+
+    foreach ($complaints as $complaint) {
+        echo "<div class='card mb-3'>";
+        echo "<div class='card-body'>";
+        echo "<h5 class='card-title'>{$complaint['title']}</h5>";
+        echo "<p class='card-text'>{$complaint['content']}</p>";
+        echo "<p class='card-text'><small class='text-muted'>Posted by User ID: {$complaint['user_id']} on {$complaint['created_at']}</small></p>";
+        echo "</div>";
+        echo "</div>";
+    }
+}
+?>
+<br>
+
+<br>
+<div class="container" style="max-width: 1500px;">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="heading_container heading_center">
+                <h2>Schedule Dashboard</h2>
+                <hr style="width: 350px; text-align: center">
+            </div>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#AddDiscussion">New Discussion</button>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <a href="editprofile.php" class="btn btn-sq-lg btn-warning d-flex justify-content-center align-items-center" style="height: 250px; border-radius: 3px; font-weight: 600;">
-                            <i class="fa fa-user fa-5x"></i>
-                            <span class="ml-2">Active Administrator</span>
-                        </a>
+                    <div class="col-md-2">
+                        <img src="./images/profile-picture/default_profile_picture.png" style="width: 100%;" alt="Profile Picture">
                     </div>
-                    <div class="col-md-6 mb-4">
-                        <a href="editprofile.php" class="btn btn-sq-lg btn-warning d-flex justify-content-center align-items-center" style="height: 250px; border-radius: 3px; font-weight: 600;">
-                            <i class="fa fa-user fa-5x"></i>
-                            <span class="ml-2">Add Administrator</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <a href="editprofile.php" class="btn btn-sq-lg btn-warning d-flex justify-content-center align-items-center" style="height: 250px; border-radius: 3px; font-weight: 600;">
-                            <i class="fa fa-user fa-5x"></i>
-                            <span class="ml-2">Active Administrator</span>
-                        </a>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <a href="editprofile.php" class="btn btn-sq-lg btn-warning d-flex justify-content-center align-items-center" style="height: 250px; border-radius: 3px; font-weight: 600;">
-                            <i class="fa fa-user fa-5x"></i>
-                            <span class="ml-2">Add Administrator</span>
-                        </a>
+                    <div class="col-md-10">
+                    <div class="box">
+                            <div class="d-flex justify-content-between">
+                                <h5>Name : [User's Name]</h5>
+                                <h5>Date : [Discussion Date]</h5>
+                            </div>
+                            <br>
+                            <h5>Title : [Discussion Title]</h5>
+                            <p>Description : [Discussion Description]</p>
+
+                            <div class="text-left">
+                                <a href="" class="btn btn-secondary mt-3">Back</a> 
+                                <a href="reply.php" class="btn btn-primary mt-3">Reply</a> 
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-
-  <!-- end info_section -->
-
-  <!-- footer section -->
-  <footer class="footer_section">
-    <div class="container">
-      <p>
-        &copy; <span id="displayDateYear"></span> All Rights Reserved By
-        
-      </p>
-      <p>
-      <a class="nav-link" href="../admin/adminLogin.php">Admin</a>
-         <a class="nav-link" href="../commitee/login/commiteeLogin.php">Committee </a>
-      </p>
+    <!-- Modal -->
+    <div class="modal fade" id="AddDiscussion" tabindex="-1" role="dialog" aria-labelledby="AddDiscussion" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddDiscussion">New Discussion</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <section class="user_profile_section layout_padding">
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-md-10">
+                                    <div class="user_profile_container">
+                                        <form id="addDiscussionForm" action="AddDiscussion.php" method="POST" enctype="multipart/form-data"> 
+                                            <div class="form-group">
+                                                <label for="Title">Title:</label>
+                                                <input type="text" class="form-control" id="Title" name="Title" value="<?php echo $UserFirstName ?>" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Desc">Description:</label>
+                                                <input type="text-area" class="form-control" id="Desc" name="Desc" value="<?php if (isset($UserLastName)) echo $UserLastName; ?>" required>
+                                            </div>
+                                            <input type="hidden" name="user_id" value="<?php echo $UserID; ?>">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                    <button type="submit" class="btn btn-primary" onclick="submitForm()">Proceed</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </footer>
-  <!-- footer section -->
+    <br>
+    <br>
+    <nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+    <li class="page-item"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  </ul>
+</nav>
 
-  <script src="js/jquery-3.4.1.min.js"></script>
-  <script src="js/bootstrap.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
-  </script>
-  <script src="js/custom.js"></script>
-  <!-- Google Map -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap"></script>
-  <!-- End Google Map -->
+</div>
 
+<br>
+<br>
 
-</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-</html>
+<script>
+    function submitForm() {
+        var Desc = document.getElementById("Desc").value.trim();
+        var Title = document.getElementById("Title").value.trim();
+
+        if (Desc === "" || Title === "") {
+            Swal.fire(
+                "Error!",
+                "Please fill out all required fields.",
+                "error"
+            );
+            return; // Stop further execution
+        }
+
+        Swal.fire({
+            title: "Add Discussion",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Proceed",
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById("addDiscussionForm").submit(); // Submit the form
+            }
+        });
+    }
+</script>
+
 
 <?php include('include/footer.php'); ?>
