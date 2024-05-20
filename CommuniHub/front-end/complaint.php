@@ -1,41 +1,10 @@
 <?php 
 session_start();
 require_once('include/header.php'); 
-
-function getComplaints() {
-    require_once('../Database/database.php');
-    
-    $sql = "SELECT * FROM complaint ORDER BY created_at DESC";
-    $result = mysqli_query($conn, $sql);
-
-    $complaints = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $complaints[] = $row;
-    }
-
-    return $complaints;
-}
-
-// Display discussions
-function displayComplaints() {
-    $complaints = getComplaints();
-
-    if (empty($complaints)) {
-        echo "No complaints found.";
-        return;
-    }
-
-    foreach ($complaints as $complaint) {
-        echo "<div class='card mb-3'>";
-        echo "<div class='card-body'>";
-        echo "<h5 class='card-title'>{$complaint['title']}</h5>";
-        echo "<p class='card-text'>{$complaint['content']}</p>";
-        echo "<p class='card-text'><small class='text-muted'>Posted by User ID: {$complaint['user_id']} on {$complaint['created_at']}</small></p>";
-        echo "</div>";
-        echo "</div>";
-    }
-}
 ?>
+</div>
+
+
 <br>
 
 <br>
@@ -66,12 +35,12 @@ function displayComplaints() {
                     <div class="col-md-10">
                     <div class="box">
                             <div class="d-flex justify-content-between">
-                                <h5>Name : [User's Name]</h5>
-                                <h5>Date : [Discussion Date]</h5>
+                                <h5>Name : <?php echo $UserFirstName . ' ' . $UserLastName; ?></h5>
+                                <h5>Date : <?php echo $UserFirstName ?> </h5>
                             </div>
                             <br>
-                            <h5>Title : [Discussion Title]</h5>
-                            <p>Description : [Discussion Description]</p>
+                            <h5>Title : <?php echo $Title ?> ]</h5>
+                            <p>Description : <?php echo $Description ?> </p>
 
                             <div class="text-left">
                                 <a href="" class="btn btn-secondary mt-3">Back</a> 
@@ -104,11 +73,11 @@ function displayComplaints() {
                                         <form id="addDiscussionForm" action="AddDiscussion.php" method="POST" enctype="multipart/form-data"> 
                                             <div class="form-group">
                                                 <label for="Title">Title:</label>
-                                                <input type="text" class="form-control" id="Title" name="Title" value="<?php echo $UserFirstName ?>" required>
+                                                <input type="text" class="form-control" id="Title" name="Title"  required>
                                             </div>
                                             <div class="form-group">
                                                 <label for="Desc">Description:</label>
-                                                <input type="text-area" class="form-control" id="Desc" name="Desc" value="<?php if (isset($UserLastName)) echo $UserLastName; ?>" required>
+                                                <input type="text-area" class="form-control" id="Desc" name="Desc"  required>
                                             </div>
                                             <input type="hidden" name="user_id" value="<?php echo $UserID; ?>">
                                         </form>
