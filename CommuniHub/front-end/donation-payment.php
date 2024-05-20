@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     console.log(CardHolder, cardType, CardNumber, expmonth, CVV); // Check form field values
 
     // Display SweetAlert confirmation prompt
-    swal({
+    Swal.fire({
         title: "Are you sure?",
         text: "Do you want to proceed with this payment?",
         icon: "info",
@@ -245,14 +245,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 data: {UserID: UserID, DonationID: DonationID, CardHolder: CardHolder , cardType :cardType, 
                     CardNumber : CardNumber , expmonth:expmonth ,CVV:CVV  ,DonationMessage:$DonationMessage, DonationTotal:DonationTotal},
                 success: function(response) {
-                    // Display SweetAlert success message after successful payment
                     swal({
                         title: "Payment Successful!",
                         text: "Thank you for your donation.",
                         icon: "success",
                         button: "OK",
                     }).then(() => {
-                        // Redirect to donation summary page
                         var url = `receipt.php?DonationID=${DonationID}&UserID=${UserID}`;
                         console.log('Form submitted');
                         console.log("Redirecting to:", url); // Check the URL being redirected to

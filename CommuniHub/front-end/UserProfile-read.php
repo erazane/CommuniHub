@@ -388,9 +388,9 @@ require_once ('../Database/database.php');
               <div class="col-md-12">
               <ul class="list-group list-group-flush">
                 <li class="list-group-item">
-                  <a href="activities-joined.php">
+                  <a href="AddComplaint.php">
                   <i class="fa fa-clock-o" aria-hidden="true"></i>
-                    Pending Complaints
+                    Make Complaint
                   </a>
                   <div class="card" style="float: right; padding: 10px;">
                     <span>6</span>
@@ -400,8 +400,8 @@ require_once ('../Database/database.php');
 
                 <li class="list-group-item">
                   <a href="activities-joined.php">
-                  <i class="fa fa-history" aria-hidden="true"></i>
-                    History
+                  <i class="fa fa-clock-o" aria-hidden="true"></i>
+                    Pending Complaints
                   </a>
                   <div class="card" style="float: right; padding: 10px;">
                     <span>6</span>

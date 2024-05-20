@@ -79,7 +79,7 @@
                   <a class="nav-link" href="activities.php">Activities</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="complaint.php">Complaint</a>
+                  <a class="nav-link" href="Discussion.php">Discussion</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="donations.php">Donations</a>
