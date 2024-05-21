@@ -1,18 +1,30 @@
-<?php 
+<?php
 session_start();
-require_once('include/header.php'); 
+require_once('include/header.php');
 ?>
 </div>
 <?php
 require_once('../Database/database.php'); // Include database connection file
 
-// Fetch data for discussions/complaints
+// Get the selected filter values from the form submission
+$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
+$filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
+
+// Fetch data for discussions/complaints with filters
 $query = "
     SELECT d.DiscussionID, d.title AS ComplainTitle, d.description AS ComplaintDescription, d.date AS ComplaintDate, u.UserFirstName, u.UserLastName
     FROM discussion d
     JOIN user u ON d.UserID = u.UserID
-    ORDER BY d.DiscussionID DESC
 ";
+
+// Add filter for type of discussion
+if ($filterType) {
+    $query .= " WHERE d.type = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
+}
+
+// Add order by clause
+$query .= " ORDER BY d.DiscussionID $filterOrder";
+
 $result = mysqli_query($dbc, $query);
 
 if (!$result) {
@@ -26,8 +38,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 ?>
 
 <br>
-
-<br>
 <div class="container" style="max-width: 1500px;">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -38,10 +48,32 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <a href="AddComplaint.php" class="btn btn-primary mr-2" >Add Complaint </a>
-            <a href="AddDiscussion.php" class="btn btn-primary mr-2" >Add Discussion </a>
+    <div class="row justify-content-between align-items-center mt-3">
+        <div class="col-md-3">
+            <a href="AddDiscussion.php" class="btn btn-primary">Add Discussion</a>
+        </div>
+        <div class="col-md-9">
+            <!-- Filter Form -->
+            <form class="form-inline justify-content-end" method="GET" action="">
+                <div class="form-group mb-2">
+                    <label for="filterType" class="mr-2">Type:</label>
+                    <select class="form-control" id="filterType" name="filterType">
+                        <option value="" <?php if ($filterType == '') echo 'selected'; ?>>All</option>
+                        <option value="Safety & Wellbeing" <?php if ($filterType == 'Safety & Wellbeing') echo 'selected'; ?>>Safety & Wellbeing</option>
+                        <option value="Infrastructure" <?php if ($filterType == 'Infrastructure') echo 'selected'; ?>>Infrastructure</option>
+                        <option value="Noise" <?php if ($filterType == 'Noise') echo 'selected'; ?>>Noise</option>
+                        <option value="Public Services" <?php if ($filterType == 'Public Services') echo 'selected'; ?>>Public Services</option>
+                    </select>
+                </div>
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="filterOrder" class="mr-2">Order:</label>
+                    <select class="form-control" id="filterOrder" name="filterOrder">
+                        <option value="ASC" <?php if ($filterOrder == 'ASC') echo 'selected'; ?>>Ascending</option>
+                        <option value="DESC" <?php if ($filterOrder == 'DESC') echo 'selected'; ?>>Descending</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Apply Filters</button>
+            </form>
         </div>
     </div>
 
@@ -122,6 +154,5 @@ while ($row = mysqli_fetch_assoc($result)) {
         });
     }
 </script>
-
 
 <?php include('include/footer.php'); ?>

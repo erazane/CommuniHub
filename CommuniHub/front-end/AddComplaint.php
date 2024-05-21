@@ -3,53 +3,61 @@ session_start();
 require_once('include/header.php'); 
 require_once('../Database/database.php');
 
-if(
-    isset($_POST['UserID']) && isset($_POST['ComplainTitle']) &&
-    isset($_POST['ComplaintDesc']) && isset($_POST['ComplaintDate']) && isset($_POST['ComplaintType']) 
-){
-    $UserID = $_POST["UserID"];
-    $ComplainTitle =$_POST['ComplaintTitle'];
-    $ComplaintDesc=$_POST['ComplaintDesc'];
-    $ComplaintDate =$_POST['ComplaintDate'];
-    $ComplaintType =$_POST['ComplaintType'];
+if (isset($_SESSION['status']) && isset($_SESSION['status_code'])) {
+    // Display success message using SweetAlert
+    echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['status']) . '", "' . htmlspecialchars($_SESSION['status_code']) . '");</script>';
+    // Unset the session variables
+    unset($_SESSION['status']);
+    unset($_SESSION['status_code']);
+}
 
-    $query = "INSERT INTO complaint(UserID,ComplaintTitle,ComplaintDesc,ComplaintDate,ComplaintType)
-              VALUES ('$UserId','$ComplaintTitle','$ComplaintDesc' ,'$ComplaintDate',$ComplaintType)";
+if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_POST['ComplaintType'])) {
+    $UserID = $_SESSION["UserID"];  // Assuming the UserID is stored in the session
+    $ComplainTitle = $_POST['ComplainTitle'];
+    $ComplaintDesc = $_POST['ComplaintDesc'];
+    $ComplaintDate = date("Y-m-d H:i:s");  // Get the current date and time
+    $ComplaintType = $_POST['ComplaintType'];
 
-            $insertResult = mysqli_query($dbc, $query);
+    $newImageName = null;
+    if ($_FILES["image"]["error"] != 4) {
+        $filename = $_FILES["image"]["name"];
+        $filesize = $_FILES["image"]["size"];
+        $tmpName = $_FILES["image"]["tmp_name"];
 
-            if ($insertResult) {
-                $_SESSION['status'] = "Inserted successfully!";
-                $_SESSION['status_code'] = "success";
-            } else {
-                echo "Error: " . $query . "<br>" . mysqli_error($dbc);
-            }
-         } else {
-            $_SESSION['status'] = "Unable to insert data";
-            $_SESSION['status_code'] = "error";
-         }
+        $validImageExtension = ['jpg', 'jpeg', 'png'];
+        $imageExtension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
-         // Image upload handling
-    // if ($_FILES["image"]["error"] != 4) {
-    //     $filename = $_FILES["image"]["name"];
-    //     $filesize = $_FILES["image"]["size"];
-    //     $tmpName = $_FILES["image"]["tmp_name"];
+        if (!in_array($imageExtension, $validImageExtension)) {
+            echo "<script>alert('Invalid Image Extension');</script>";
+        } elseif ($filesize > 1000000) {
+            echo "<script>alert('Image Size Too large');</script>";
+        } else {
+            $newImageName = uniqid() . '.' . $imageExtension;
+            move_uploaded_file($tmpName, '../front-end/images/complaint/' . $newImageName);
+        }
+    }
 
-    //     $validImageExtension = ['jpg', 'jpeg', 'png'];
-    //     $imageExtension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    if (!empty($ComplainTitle) && !empty($ComplaintDesc) && !empty($ComplaintType)) {
+        $query = "INSERT INTO complaint (UserID, ComplainTitle, ComplaintDesc, ComplaintDate, ComplaintType, image)
+                  VALUES ('$UserID', '$ComplainTitle', '$ComplaintDesc', '$ComplaintDate', '$ComplaintType', '$newImageName')";
 
-    //     if (!in_array($imageExtension, $validImageExtension)) {
-    //         echo "<script>alert('Invalid Image Extension');</script>";
-    //     } elseif ($filesize > 1000000) {
-    //         echo "<script>alert('Image Size Too large');</script>";
-    //     } else {
-    //         $newImageName = uniqid() . '.' . $imageExtension;
-    //         move_uploaded_file($tmpName, '../Committee/images/donations/' . $newImageName);
-    //     }
-    // }
+        $insertResult = mysqli_query($dbc, $query);
 
+        if ($insertResult) {
+            $_SESSION['status'] = "Inserted successfully!";
+            $_SESSION['status_code'] = "success";
+        } else {
+            echo "Error: " . $query . "<br>" . mysqli_error($dbc);
+        }
+    } else {
+        $_SESSION['status'] = "Unable to insert data";
+        $_SESSION['status_code'] = "error";
+    }
 
-?>
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+    }
+ ?>
 
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
@@ -58,11 +66,10 @@ if(
             <hr>
         </div>
         <div class="row">
-        <div class="col-lg-3">
+            <div class="col-lg-3">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="font-weight-bold">Fill Out the Form Below to Add a New Complaint</h4>
-                        
                         <h5>How to Make a Complaint:</h5>
                         <br>
                         <ul class="list-group list-group-flush mb-3">
@@ -92,15 +99,12 @@ if(
             <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
-                    <form id="addActivitiesForm" action="#" method="POST" enctype="multipart/form-data">
-                            <h4><strong>Fill out the form below to add a new donation.</strong></h4>
+                        <form id="addComplaint" action="#" method="POST" enctype="multipart/form-data">
+                            <h4><strong>Fill out the form below to add a new complaint.</strong></h4>
                             <hr>
                             <?php
-                                // Check if success message is set
                                 if (isset($_SESSION['success'])) {
-                                    // Display success message using SweetAlert
                                     echo '<script>swal("Success!", "' . $_SESSION['success'] . '", "success");</script>';
-                                    // Unset the session variable
                                     unset($_SESSION['success']);
                                 }
                             ?>
@@ -113,38 +117,34 @@ if(
                                 <textarea class="form-control" id="ComplaintDesc" name="ComplaintDesc" rows="10" required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="ComplaintType"> Type:</label>
+                                <label for="ComplaintType">Type:</label>
                                 <select class="form-control" id="ComplaintType" name="ComplaintType" required>
                                     <option value="" disabled selected>Select Type</option>
                                     <option value="Safety & Wellbeing">Safety & Wellbeing</option>
                                     <option value="Infrastructure">Infrastructure</option>
-                                    <option value="Noise">Noise</option> <!-- New relevant complaint type -->
-                                    <option value="Public Services">Public Services</option> <!-- New relevant complaint type -->
+                                    <option value="Noise">Noise</option>
+                                    <option value="Public Services">Public Services</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="DonationEndDate">Image:</label>
-                                    <input type="file" name="image" id="image" accept=".jpg, .jpeg, .png" value="">
+                                <label for="image">Image:</label>
+                                <input type="file" name="image" id="image" accept=".jpg, .jpeg, .png">
                             </div>
 
-                            
                             <div class="text-right">
                                 <button type="button" onclick="addComplaint();" class="btn btn-primary btn-lg">Confirm</button>
                             </div>
-                           
                         </form>
                     </div>
                 </div>
                 <br>
-                
                 <div class="card">
                     <div class="card-body">
-                    <h5>Your voice matters to make our community a better place.</h5>
-
-                    <div class="text-right">
-                                <a  href="UserProfile-read.php" class="btn btn-secondary btn-lg">Back</a>
-                                <a  href="pendingComplaint.php" class="btn btn-primary btn-lg">Pending</a>
-                            </div>
+                        <h5>Your voice matters to make our community a better place.</h5>
+                        <div class="text-right">
+                            <a href="UserProfile-read.php" class="btn btn-secondary btn-lg">Back</a>
+                            <a href="pendingComplaint.php" class="btn btn-primary btn-lg">Pending</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -153,45 +153,30 @@ if(
 </section>
 
 <script>
-                               function addComplaint() {
-                                    var ComplaintTitle = document.getElementById("ComplaintTitle").value.trim();
-                                    var ComplaintDesc = document.getElementById("ComplaintDesc").value.trim();
-                                    var ComplaintType = document.getElementById("ActivityComplaintTypeDate").value.trim();
-                                    // var ActivityTime = document.getElementById("ActivityTime").value.trim();
-                                    // var image = document.getElementById("image").files[0]; // Get the file object  || !image
+    function addComplaint() {
+        var ComplaintTitle = document.getElementById("ComplainTitle").value.trim();
+        var ComplaintDesc = document.getElementById("ComplaintDesc").value.trim();
+        var ComplaintType = document.getElementById("ComplaintType").value.trim();
 
-                                    if (
-                                        ComplaintTitle === "" || ComplaintDesc === "" ||
-                                        ComplaintType === "" 
-                                        ) {
+        if (ComplaintTitle === "" || ComplaintDesc === "" || ComplaintType === "") {
+            swal("Error!", "Please fill out all required fields.", "error");
+            return;
+        }
 
-                                        swal("Error!", "Please fill out all required fields.", "error");
-                                        return;
-                                    }
-                                            // Check if swal is called
-                                            console.log("SweetAlert called");
-                                    swal({
-                                        title: "Would you like to make this complaint?",
-                                                text: "Click confirm if you wish to proceed",
-                                                icon: "info",
-                                                showCancelButton: true,
-                                                confirmButtonText: 'Confirm',
-                                                cancelButtonText: 'Cancel',
-                                                reverseButtons: true
-                                             }).then((willJoin) => {
-                                                if (willJoin) {
-                                                    // If user confirms, submit the form
-                                                    document.querySelector('form').submit();
-                                                } else {
-                                                    // If user cancels, do nothing
-                                                    console.log("User cancelled.");
-                                                }
-                                            });
-                                    }
-                            </script>
+        swal({
+            title: "Would you like to make this complaint?",
+            text: "Click confirm if you wish to proceed",
+            icon: "info",
+            buttons: true,
+            dangerMode: true,
+        }).then((willProceed) => {
+            if (willProceed) {
+                document.getElementById("addComplaint").submit();
+            } else {
+                console.log("User cancelled.");
+            }
+        });
+    }
+</script>
+
 <?php include('include/footer.php'); ?>
-
-
-
-
-
