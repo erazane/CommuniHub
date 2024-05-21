@@ -1,9 +1,27 @@
 <?php
 session_start();
 include('include/header.php');
-
 ?>
 </div>
+<?php
+require_once('../Database/database.php');
+
+$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
+
+// Initial query
+$query = "SELECT ComplaintID, ComplainTitle, ComplaintDesc, ComplaintDate, ComplaintType, UserID, image FROM complaint";
+
+// Add filter for type of discussion
+if ($filterType) {
+    $query .= " WHERE ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
+}
+
+$result = mysqli_query($dbc, $query); // Run the query
+
+if (!$result) {
+    die('Query failed: ' . mysqli_error($dbc));
+}
+?>
 
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
@@ -12,23 +30,39 @@ include('include/header.php');
             <hr>
         </div>
         <div class="row">
+            <br>
+            <br>
             <div class="col-lg-3">
                 <div class="pillbox border">
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="manage-donations.php">Current Schedule</a>
+                            <a class="nav-link active" href="manage-donations.php">Current Complaint</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="donation-joined.php">Donations Joined</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="add-donation.php">Add Donations</a>
+                            <a class="nav-link" href="donation-joined.php">Pending</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="donation-history.php">History</a>
                         </li>
                     </ul>
                 </div>
+                <br>
+                <br>
+                <!-- filter -->
+                <form class="form-inline justify-content-end" method="GET" action="">
+                    <div class="form-group mb-2">
+                        <label for="filterType" class="mr-2">Type:</label>
+                        <select class="form-control" id="filterType" name="filterType">
+                            <option value="" <?php if ($filterType == '') echo 'selected'; ?>>All</option>
+                            <option value="Safety & Wellbeing" <?php if ($filterType == 'Safety & Wellbeing') echo 'selected'; ?>>Safety & Wellbeing</option>
+                            <option value="Infrastructure" <?php if ($filterType == 'Infrastructure') echo 'selected'; ?>>Infrastructure</option>
+                            <option value="Noise" <?php if ($filterType == 'Noise') echo 'selected'; ?>>Noise</option>
+                            <option value="Public Services" <?php if ($filterType == 'Public Services') echo 'selected'; ?>>Public Services</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Apply Filters</button>
+                </form>
+                <!-- end filter -->
             </div>
             <div class="col-lg-9">
                 <table class="table">
@@ -36,33 +70,58 @@ include('include/header.php');
                         <tr>
                             <th scope="col">Title</th>
                             <th scope="col">Description</th>
-                            <th scope="col">Target</th>
-                            <th scope="col">Current Collection</th>
-                            <th scope="col">Start Date</th>
-                            <th scope="col">End Date</th>
-                            <th scope="col">Priority</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Image</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                        <tr>
-                            <td><?php echo $row['DonationName']; ?></td>
-                            <td style="text-align: justify;"><?php echo $row['DonationDesc']; ?></td>
-                            <td><?php echo $row['DonationTarget']; ?></td>
-                            <td><?php echo $row['DonationCollectAmount']?></td>
-                            <td><?php echo $row['DonationStartDate']; ?></td>
-                            <td><?php echo $row['DonationEndDate']; ?></td>
-                            <td><?php echo $row['DonationStatus']; ?></td>
-                            
-                            <td>
-                                <div class="btn-group" style="padding: 5;">
-                                    <br><br>
-                                    <button type="button" class="btn btn-warning" onclick="deleteDonation(<?php echo $row['DonationID']; ?>)">Delete </button>
-                                    <button type="button" class="btn btn-secondary" onclick="UpdateDonation(<?php echo $row['DonationID']; ?>)">Update </button>
+                            <tr>
+                                <td><?php echo $row['ComplainTitle']; ?></td>
+                                <td style="text-align: justify;"><?php echo $row['ComplaintDesc']; ?></td>
+                                <td><?php echo $row['ComplaintType']; ?></td>
+                                <td><?php echo $row['ComplaintDate']; ?></td>
+                                <td>
+                                    <?php if (!empty($row['image'])) : ?>
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#imageModal<?php echo $row['ComplaintID']; ?>">
+                                            View 
+                                        </button>
+                                    <?php else : ?>
+                                        No Image
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="btn-group" style="padding: 5;">
+                                        <br><br>
+                                        <a href="resolve-complaint.php?ComplaintID=<?php echo $row['ComplaintID']; ?>" class="btn btn-primary">Resolve</a>
+                                        <!-- <a href="resolve-complaint.php" class="btn btn-primary" onclick="resolveComplaint(<?php echo $row['ComplaintID']; ?>)">Resolve</a> -->
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="imageModal<?php echo $row['ComplaintID']; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel"><?php echo $row['ComplainTitle']; ?></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="profile_picture_container text-center mb-4" style="padding: 10%;">
+                                                <img class="img-fluid" src="../front-end/images/complaint/<?php echo $row['image'] ? $row['image'] : "nodata.jpg"; ?>" alt="<?php echo $row['ComplainTitle']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </td>
-                        </tr>
+                            </div>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
@@ -70,6 +129,5 @@ include('include/header.php');
         </div>
     </div>
 </section>
-
 
 <?php include('include/footer.php'); ?>

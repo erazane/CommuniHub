@@ -12,6 +12,9 @@ $query = "SELECT DonationID, DonationDesc, DonationName, DonationTarget,Donation
  FROM donation WHERE status='Ongoing' ORDER BY DonationID ASC";
 
 $result = mysqli_query($dbc, $query); // Run the query
+
+
+
 ?>
 
 <section class="service_section layout_padding wider_section">

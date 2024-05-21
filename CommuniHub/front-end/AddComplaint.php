@@ -4,9 +4,7 @@ require_once('include/header.php');
 require_once('../Database/database.php');
 
 if (isset($_SESSION['status']) && isset($_SESSION['status_code'])) {
-    // Display success message using SweetAlert
     echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['status']) . '", "' . htmlspecialchars($_SESSION['status_code']) . '");</script>';
-    // Unset the session variables
     unset($_SESSION['status']);
     unset($_SESSION['status_code']);
 }
@@ -47,7 +45,8 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
             $_SESSION['status'] = "Inserted successfully!";
             $_SESSION['status_code'] = "success";
         } else {
-            echo "Error: " . $query . "<br>" . mysqli_error($dbc);
+            $_SESSION['status'] = "Error: " . mysqli_error($dbc);
+            $_SESSION['status_code'] = "error";
         }
     } else {
         $_SESSION['status'] = "Unable to insert data";
@@ -56,8 +55,8 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
 
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
-    }
- ?>
+}
+?>
 
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
@@ -103,8 +102,11 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
                             <h4><strong>Fill out the form below to add a new complaint.</strong></h4>
                             <hr>
                             <?php
+                                // Check if success message is set
                                 if (isset($_SESSION['success'])) {
+                                    // Display success message using SweetAlert
                                     echo '<script>swal("Success!", "' . $_SESSION['success'] . '", "success");</script>';
+                                    // Unset the session variable
                                     unset($_SESSION['success']);
                                 }
                             ?>
