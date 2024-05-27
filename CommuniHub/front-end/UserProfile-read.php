@@ -399,7 +399,7 @@ require_once ('../Database/database.php');
                 </li>
 
                 <li class="list-group-item">
-                  <a href="activities-joined.php">
+                  <a href="resolved-complaints.php">
                   <i class="fa fa-clock-o" aria-hidden="true"></i>
                     Pending Complaints
                   </a>

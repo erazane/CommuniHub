@@ -3,88 +3,56 @@ session_start();
 include('include/header.php');
 ?>
 </div>
+<!-- end header section -->
 <?php
 require_once('../Database/database.php');
 
-$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
+$UserID = $_SESSION["UserID"];
 $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
-
-// Initial query
+// Define the query to fetch complaints made by the user that are not 'completed'
 $query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDate, c.ComplaintType, c.UserID, c.image 
           FROM complaint c 
           LEFT JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID
-          WHERE r.status != 'Completed' OR r.status IS NULL";
-
-// Add filter for type of discussion
-if ($filterType) {
-    $query .= " WHERE ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
-}
+          WHERE c.UserID = $UserID AND (r.status != 'Completed' OR r.status IS NULL)
+          ORDER BY c.ComplaintDate $filterOrder";
 
 $result = mysqli_query($dbc, $query); // Run the query
 
-// Add order by clause
-$query .= " ORDER BY c.ComplaintDate " . $filterOrder;
-
-$result = mysqli_query($dbc, $query); // Run the query
-
+// Check if query was successful
 if (!$result) {
-    die('Query failed: ' . mysqli_error($dbc));
+    echo "Error: " . mysqli_error($dbc);
+    exit();
 }
 ?>
 
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
-            <h2>Complaints Dashboard</h2>
+            <h2>Activity History</h2>
             <hr>
         </div>
-        <div class="row">
-            <br>
-            <br>
-            <div class="col-lg-3">
-                <div class="pillbox border">
-                    <ul class="nav nav-pills flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="manage-donations.php">Current Complaint</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="history-complaint.php">History</a>
-                        </li>
-                    </ul>
-                </div>
-                <br>
-                <br>
-               <!-- filter -->
-                <form class="form-inline justify-content-end" method="GET" action="">
-                    <div class="form-row align-items-center">
-                        <div class="col-auto mb-2">
-                            <label for="filterType" class="mr-2">Type:</label>
-                            <select class="form-control" id="filterType" name="filterType">
-                                <option value="" <?php if ($filterType == '') echo 'selected'; ?>>All</option>
-                                <option value="Safety & Wellbeing" <?php if ($filterType == 'Safety & Wellbeing') echo 'selected'; ?>>Safety & Wellbeing</option>
-                                <option value="Infrastructure" <?php if ($filterType == 'Infrastructure') echo 'selected'; ?>>Infrastructure</option>
-                                <option value="Noise" <?php if ($filterType == 'Noise') echo 'selected'; ?>>Noise</option>
-                                <option value="Public Services" <?php if ($filterType == 'Public Services') echo 'selected'; ?>>Public Services</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-auto mb-2">
-                            <label for="filterOrder" class="mr-2">Order:</label>
-                            <select class="form-control" id="filterOrder" name="filterOrder">
-                                <option value="DESC" <?php if ($filterOrder == 'DESC') echo 'selected'; ?>>Descending</option>
-                                <option value="ASC" <?php if ($filterOrder == 'ASC') echo 'selected'; ?>>Ascending</option>
-                            </select>
-                        </div>
-                        <div class="form-group mb-2 w-100">
-                        <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
-                    </div>
-                    </div>
-                </form>
-                <!-- end filter -->
-
+        <div class="row justify-content-between align-items-center mt-3">
+            <div class="col-md-3">
+                <a class="btn btn-primary" href="resolved-complaints.php">Completed</a>
+                <a class="btn btn-primary active" href="pending-complaints.php">Pending</a>
             </div>
-            <div class="col-lg-9">
+            <div class="col-md-9">
+                <!-- Filter Form -->
+                <form class="form-inline justify-content-end" method="GET" action="">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="filterOrder" class="mr-2">Order:</label>
+                        <select class="form-control" id="filterOrder" name="filterOrder">
+                            <option value="ASC" <?php if ($filterOrder == 'ASC') echo 'selected'; ?>>Ascending</option>
+                            <option value="DESC" <?php if ($filterOrder == 'DESC') echo 'selected'; ?>>Descending</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Apply Filters</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
@@ -93,7 +61,6 @@ if (!$result) {
                             <th scope="col">Type</th>
                             <th scope="col">Date</th>
                             <th scope="col">Image</th>
-                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -111,13 +78,6 @@ if (!$result) {
                                     <?php else : ?>
                                         No Image
                                     <?php endif; ?>
-                                </td>
-                                <td>
-                                    <div class="btn-group" style="padding: 5;">
-                                        <br><br>
-                                        <a href="resolve-complaint.php?ComplaintID=<?php echo $row['ComplaintID']; ?>" class="btn btn-primary">Resolve</a>
-                                        <!-- <a href="resolve-complaint.php" class="btn btn-primary" onclick="resolveComplaint(<?php echo $row['ComplaintID']; ?>)">Resolve</a> -->
-                                    </div>
                                 </td>
                             </tr>
 
@@ -145,6 +105,10 @@ if (!$result) {
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                <hr>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a class="btn btn-primary me-md-2" href="UserProfile-read.php">Back</a>
+                </div>
             </div>
         </div>
     </div>

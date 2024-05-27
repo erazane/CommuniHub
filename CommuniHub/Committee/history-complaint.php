@@ -13,15 +13,13 @@ $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 // Initial query
 $query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDate, c.ComplaintType, c.UserID, c.image 
           FROM complaint c 
-          LEFT JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID
-          WHERE r.status != 'Completed' OR r.status IS NULL";
+          JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID
+          WHERE r.status = 'Completed'";
 
 // Add filter for type of discussion
 if ($filterType) {
     $query .= " WHERE ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
 }
-
-$result = mysqli_query($dbc, $query); // Run the query
 
 // Add order by clause
 $query .= " ORDER BY c.ComplaintDate " . $filterOrder;
@@ -46,16 +44,17 @@ if (!$result) {
                 <div class="pillbox border">
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="manage-donations.php">Current Complaint</a>
+                            <a class="nav-link " href="manage-complaint.php">Current Complaint</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="history-complaint.php">History</a>
+                            <a class="nav-link active" href="history-complaint.php">History</a>
                         </li>
                     </ul>
                 </div>
                 <br>
                 <br>
-               <!-- filter -->
+                <hr>
+                <!-- filter -->
                 <form class="form-inline justify-content-end" method="GET" action="">
                     <div class="form-row align-items-center">
                         <div class="col-auto mb-2">
@@ -68,7 +67,6 @@ if (!$result) {
                                 <option value="Public Services" <?php if ($filterType == 'Public Services') echo 'selected'; ?>>Public Services</option>
                             </select>
                         </div>
-                        
                         <div class="col-auto mb-2">
                             <label for="filterOrder" class="mr-2">Order:</label>
                             <select class="form-control" id="filterOrder" name="filterOrder">
@@ -93,7 +91,6 @@ if (!$result) {
                             <th scope="col">Type</th>
                             <th scope="col">Date</th>
                             <th scope="col">Image</th>
-                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -112,13 +109,7 @@ if (!$result) {
                                         No Image
                                     <?php endif; ?>
                                 </td>
-                                <td>
-                                    <div class="btn-group" style="padding: 5;">
-                                        <br><br>
-                                        <a href="resolve-complaint.php?ComplaintID=<?php echo $row['ComplaintID']; ?>" class="btn btn-primary">Resolve</a>
-                                        <!-- <a href="resolve-complaint.php" class="btn btn-primary" onclick="resolveComplaint(<?php echo $row['ComplaintID']; ?>)">Resolve</a> -->
-                                    </div>
-                                </td>
+                                
                             </tr>
 
                             <!-- Modal -->
