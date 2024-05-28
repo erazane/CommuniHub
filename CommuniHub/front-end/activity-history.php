@@ -7,7 +7,7 @@ include('include/header.php');
 <?php
 require_once('../Database/database.php');
 
-// Get user ID
+$filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 $UserID = $_SESSION["UserID"];
 
 // Make the query to retrieve the user's joined activities history
@@ -36,6 +36,25 @@ if (!$result) {
             <h2>Activity History</h2>
             <hr>
         </div>
+        <div class="row justify-content-between align-items-center mt-3">
+            <div class="col-md-3">
+                <a class="btn btn-primary" href="activities-joined.php">Upcoming</a>
+                <a class="btn btn-primary active" href="activity-history.php">History</a>
+            </div>
+            <div class="col-md-9">
+                <!-- Filter Form -->
+                <form class="form-inline justify-content-end" method="GET" action="">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="filterOrder" class="mr-2">Order:</label>
+                        <select class="form-control" id="filterOrder" name="filterOrder">
+                            <option value="ASC" <?php if ($filterOrder == 'ASC') echo 'selected'; ?>>Ascending</option>
+                            <option value="DESC" <?php if ($filterOrder == 'DESC') echo 'selected'; ?>>Descending</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Apply Filters</button>
+                </form>
+            </div>
+        </div>
         <div class="row">
             <div class="col-lg-12">
                 <table class="table">
@@ -60,8 +79,11 @@ if (!$result) {
                         <?php endwhile; ?>
                     </tbody>
                 </table>
-                <a class="nav-link btn btn-secondary" href="UserProfile-read.php">Back</a>
-                <a class="nav-link btn btn-secondary" href="activities-joined">Upcoming Activities</a>
+                <hr>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a class="btn btn-primary me-md-2" href="UserProfile-read.php">Back</a>
+                </div>
+                <!-- <a class="nav-link btn btn-secondary" href="UserProfile-read.php">Back</a> -->
             </div>
         </div>
     </div>

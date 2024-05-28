@@ -1,4 +1,7 @@
-<?php 
+<?php
+
+use LDAP\Result;
+
 session_start();
 require_once('include/header.php'); 
 ?>
@@ -7,24 +10,13 @@ require_once('include/header.php');
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-
-
-
-<!-- User Profile Form -->
-
 <?php
 require_once ('../Database/database.php');
-
-
-// }
 
     if (isset($_SESSION['password_status']) && isset($_SESSION['password_status_code'])) {
       echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['password_status']) . '", "' . htmlspecialchars($_SESSION['password_status_code']) . '");</script>';
       unset($_SESSION['password_status']);
       unset($_SESSION['password_status_code']);
-    // } else {
-    //   // Display error message for password not set correctly
-    //   echo '<script>swal("Error!", "Password not set correctly.", "error");</script>';
     }
 
     // Check if profile status session variables are set
@@ -32,15 +24,13 @@ require_once ('../Database/database.php');
       echo '<script>swal("Profile Update!", "' . htmlspecialchars($_SESSION['profile_status']) . '", "' . htmlspecialchars($_SESSION['profile_status_code']) . '");</script>';
       unset($_SESSION['profile_status']);
       unset($_SESSION['profile_status_code']);
-    // } else {
-    //   // Display error message for data cannot be inserted
-    //   echo '<script>swal("Error!", "Data cannot be inserted.", "error");</script>';
+      echo '<script>swal("Error!", "Data cannot be inserted.", "error");</script>';
     }
   
-    
     // Get user ID
     $UserID = $_SESSION["UserID"];
 
+    // query for activity joined
     $query = "SELECT COUNT(*) AS activity_count FROM activitiesJoined WHERE UserID = $UserID";
     $result = mysqli_query($dbc, $query);
 
@@ -48,31 +38,59 @@ require_once ('../Database/database.php');
       $row = mysqli_fetch_assoc($result);
        $activityCount=$row['activity_count'];
     }else{
-      $activityCount = 0;  //setting default is zero
+      $activityCount = 0;  
     }
 
-    $query = "SELECT COUNT(*) AS history_count
-    FROM activities a
-    JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID
-    WHERE aj.UserID = $UserID
-    AND a.Status = 'Completed'";
-
+    // query for activity joined that has been completed
+    $query = "SELECT COUNT(*) AS history_count FROM activities a JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID  WHERE aj.UserID = $UserID AND a.Status = 'Completed'";
     $result = mysqli_query($dbc, $query);
 
     if($result){
       $row = mysqli_fetch_assoc($result);
        $history_count=$row['history_count'];
     }else{
-      $history_count = 0;  //setting default is zero
+      $history_count = 0;  
+    }
+
+    // query for donations joined
+    $query= "SELECT COUNT(*) AS DonationCount FROM donations d JOIN donationJoined dj ON  d.donationID = dj.donationID WHERE dj.UserId =$UserID";
+    $result= mysqli_query($dbc,$query);
+
+    if($result){
+      $row= mysqli_fetch_assoc($result);
+      $DonationCount=$row['DonationCount'];
+    }else{
+      $DonationCount=0;
+    }
+
+    // query for complaints pending
+    $query= "    SELECT COUNT(*) AS pendingComplaintCount FROM complaint c LEFT JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID WHERE r.ComplaintID IS NULL AND c.UserID = '$UserID' ";
+    $result=mysqli_query($dbc,$query);
+
+    if($result){
+      $row=mysqli_fetch_assoc($result);
+      $pendingComplaintCount=$row['pendingComplaintCount'];
+    }else{
+      $pendingComplaintCount=0;
+    }
+
+    // query for resolved complaints
+    $query="    SELECT COUNT(*) AS HistoryComplaintCount FROM complaint c JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID WHERE r.status = 'Completed' AND c.UserID = '$UserID'";
+    $result =mysqli_query($dbc,$query);
+
+    if($result){
+      $row=mysqli_fetch_assoc($result);
+      $HistoryComplaintCount=$row['HistoryComplaintCount'];
+    }else{
+      $HistoryComplaintCount=0;
     }
 
     // Query to fetch user information
-    $query = "SELECT * FROM user WHERE UserID = '$UserID'";
+    $query = "SELECT * FROM user WHERE UserID = '$UserID'"; 
     $result = @mysqli_query($dbc, $query);
 
     // Check if the query executed successfully
     if ($result && mysqli_num_rows($result) == 1) {
-        // Fetch user information
         $row = mysqli_fetch_assoc($result);
         $profileImage = $row["UserImg"];
         $UserFirstName = $row['UserFirstName'];
@@ -369,8 +387,8 @@ require_once ('../Database/database.php');
                     History
                   </a>
                   <div class="card" style="float: right; padding: 10px;">
-                    <span>6</span>
-                    <!-- <span><?php echo $activityCount; ?></span> -->
+                    
+                    <span><?php echo $DonationCount; ?></span>
                   </div>
                 </li>
                 </li>
@@ -392,20 +410,29 @@ require_once ('../Database/database.php');
                   <i class="fa fa-clock-o" aria-hidden="true"></i>
                     Make Complaint
                   </a>
-                  <div class="card" style="float: right; padding: 10px;">
+                  <!-- <div class="card" style="float: right; padding: 10px;">
                     <span>6</span>
-                    <!-- <span><?php echo $activityCount; ?></span> -->
+                    <span><?php echo $activityCount; ?></span>
+                  </div> -->
+                </li>
+
+                <li class="list-group-item">
+                  <a href="pending-complaints.php">
+                  <i class="fa fa-clock-o" aria-hidden="true"></i>
+                    Pending Complaints
+                  </a>
+                  <div class="card" style="float: right; padding: 10px;">
+                    <span><?php echo $pendingComplaintCount; ?></span>
                   </div>
                 </li>
 
                 <li class="list-group-item">
                   <a href="resolved-complaints.php">
                   <i class="fa fa-clock-o" aria-hidden="true"></i>
-                    Pending Complaints
+                    History
                   </a>
                   <div class="card" style="float: right; padding: 10px;">
-                    <span>6</span>
-                    <!-- <span><?php echo $activityCount; ?></span> -->
+                    <span><?php echo $HistoryComplaintCount; ?></span>
                   </div>
                 </li>
 

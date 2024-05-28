@@ -34,8 +34,8 @@ if (!$result) {
         </div>
         <div class="row justify-content-between align-items-center mt-3">
             <div class="col-md-3">
-                <a class="btn btn-primary" href="resolved-complaints.php">Completed</a>
-                <a class="btn btn-primary active" href="pending-complaints.php">Pending</a>
+                 <a class="btn btn-primary active" href="pending-complaints.php">Pending</a>
+                <a class="btn btn-primary" href="resolved-complaints.php">History</a>
             </div>
             <div class="col-md-9">
                 <!-- Filter Form -->
