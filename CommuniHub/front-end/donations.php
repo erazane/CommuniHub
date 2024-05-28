@@ -10,14 +10,19 @@ require_once('include/header.php');
 
 // Get user ID
 require_once('../Database/database.php');
+
+$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : 'Ongoing'; // Default to 'Ongoing'
 $UserID = $_SESSION["UserID"];
 
+// Prepare the query with the filter type
 $query = "SELECT  
     DonationID, DonationDesc, DonationName, 
     DonationTarget, DonationStatus, image
-    FROM donation WHERE status='Ongoing'
-    ORDER BY  DonationID DESC";
-$result = @mysqli_query($dbc, $query);
+    FROM donation 
+    WHERE status = '" . mysqli_real_escape_string($dbc, $filterType) . "'
+    ORDER BY DonationID DESC";
+
+$result = mysqli_query($dbc, $query);
 
 if (!$result) {
     die('Query failed: ' . mysqli_error($dbc));
@@ -28,6 +33,20 @@ if (!$result) {
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
             <h2>Active Donations</h2>
+        </div>
+        <div class="row justify-content-center align-items-center mt-3">
+            <div class="col-md-9 d-flex justify-content-center">
+                <form class="form-inline" method="GET" action="">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label for="filterType" class="mr-2">Status:</label>
+                        <select class="form-control" id="filterType" name="filterType">
+                            <option value="Ongoing" <?php if ($filterType == 'Ongoing') echo 'selected'; ?>>Ongoing</option>
+                            <option value="Completed" <?php if ($filterType == 'Completed') echo 'selected'; ?>>Completed</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Apply Filters</button>
+                </form>
+            </div>
         </div>
         <div class="row">
             <?php
@@ -47,24 +66,22 @@ if (!$result) {
             ?>
             <div class="col-md-4">
                 <div class="card h-100"> <!-- Ensure cards have equal height -->
-                    <img class="card-img-top img-fluid" src="../Committee/images/donations/<?php echo $image; ?>" alt="<?php echo $DonationName; ?>" style="height: 200px; object-fit: cover;">
+                    <img class="card-img-top img-fluid" src="../Committee/images/donations/<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($DonationName); ?>" style="height: 200px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title"><?php echo htmlspecialchars($DonationName); ?></h5>
                         <p class="card-text text-justify"><?php echo htmlspecialchars($DonationDesc); ?></p>
-                    
-                            <!-- <p class="card-text"><?php echo htmlspecialchars($DonationDesc); ?></p> -->
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-between">
-                                <strong><p>Target: <?php echo htmlspecialchars($DonationTarget); ?></p></strong>
-                                <strong><p>Status: <?php echo htmlspecialchars($DonationStatus); ?></p></strong>
-                            </div>
+                            <strong><p>Target: <?php echo htmlspecialchars($DonationTarget); ?></p></strong>
+                            <strong><p>Status: <?php echo htmlspecialchars($DonationStatus); ?></p></strong>
+                        </div>
                         <br>
                         <div class="progress" style="height: 20px;">
                             <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <br>
-                        <a href="join-donation.php?DonationID=<?php echo $DonationID; ?>&UserID=<?php echo $UserID; ?>" class="btn btn-primary btn-lg btn-block">Join</a>
+                        <a href="payment.php?DonationID=<?php echo $DonationID; ?>&UserID=<?php echo $UserID; ?>" class="btn btn-primary btn-lg btn-block">Join</a>
                     </div>
                 </div>
             </div>

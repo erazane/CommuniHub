@@ -15,10 +15,6 @@ require_once('include/header.php');
         $UserID = $_GET["UserID"];
         $DonationID = $_GET["DonationID"];
 
-        // echo "UserID: " . $UserID . "<br>";
-        // echo "DonationID: " . $DonationID . "<br>";
-
-        // Check if UserID is set in session, if not, use the one from URL parameter
         if(!isset($_SESSION["UserID"])) {
             $_SESSION["UserID"] = $UserID; // Set UserID in session if it's not already set
         }
@@ -85,7 +81,7 @@ require_once('include/header.php');
             <div class="col-md-4 mx-auto" style="max-width: 800px;">
                 <div class="card">
                     <div class="card-body">
-                        <form id="donationForm" action="donation-payment.php" method="POST" enctype="multipart/form-data">
+                        <form id="donationForm" action="payment.php" method="POST" enctype="multipart/form-data">
                             <h4><strong>Fill out the form below to support the cause with your generous donation.</strong></h4>
                             <hr>
                             <div class="form-group">
@@ -159,7 +155,7 @@ require_once('include/header.php');
                                         showCancelButton: true,
                                         confirmButtonText: "Proceed",
                                         cancelButtonText: "Cancel"
-                                    }).then((willProceed) => {
+                                    }).then((result) => {
                                         if (result.isConfirmed) {
                                             document.getElementById("donationForm").submit();
                                         }
