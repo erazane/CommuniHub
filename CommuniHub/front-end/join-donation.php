@@ -159,7 +159,7 @@ require_once('include/header.php');
                                         showCancelButton: true,
                                         confirmButtonText: "Proceed",
                                         cancelButtonText: "Cancel"
-                                    }).then((result) => {
+                                    }).then((willProceed) => {
                                         if (result.isConfirmed) {
                                             document.getElementById("donationForm").submit();
                                         }

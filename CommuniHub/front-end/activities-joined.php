@@ -16,7 +16,8 @@ SELECT a.ActivityID, a.Activityname, a.ActivityLocation, a.ActivityDate, a.Activ
 FROM activitiesJoined aj
 JOIN activities a ON aj.ActivityID = a.ActivityID
 WHERE aj.UserID = $UserID
-AND a.Status != 'Completed';
+AND a.Status != 'Completed'
+ORDER BY a.ActivityDate $filterOrder;
 ";
 
 $result = mysqli_query($dbc, $query); // Run the query
@@ -38,7 +39,7 @@ if (!$result) {
         <div class="row justify-content-between align-items-center mt-3">
             <div class="col-md-3">
                 <a class="btn btn-primary active" href="activities-joined.php">Upcoming</a>
-                <a class="btn btn-primary " href="activity-history.php">History</a>
+                <a class="btn btn-primary" href="activity-history.php">History</a>
             </div>
             <div class="col-md-9">
                 <!-- Filter Form -->
@@ -59,29 +60,33 @@ if (!$result) {
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
-                        <th scope="col">Title</th>
+                            <th scope="col">No</th>
+                            <th scope="col">Title</th>
                             <th scope="col">Location</th>
                             <th scope="col">Date</th>
                             <th scope="col">Time</th>
                             <th scope="col">Type</th>
-                            <th scope="col"> Action</th>
+                            <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                        <?php 
+                        $counter = 1; // Initialize counter
+                        while ($row = mysqli_fetch_assoc($result)) : 
+                        ?>
                             <tr>
+                                <td><?php echo $counter++; ?></td>
                                 <td><?php echo $row['Activityname']; ?></td>
                                 <td><?php echo $row['ActivityLocation']; ?></td>
                                 <td><?php echo $row['ActivityDate']; ?></td>
                                 <td><?php echo $row['ActivityTime']; ?></td>
                                 <td><?php echo $row['ActivityType']; ?></td>
-
                                 <td>
-                                <div class="btn-group" style="padding: 5;">
-                                    <br><br>
-                                    
-                                    <button type="button" class="btn btn-warning" onclick="unjoin(<?php echo $row['ActivityID']; ?>)">Unjoin </button>
-                                    
+                                    <div class="btn-group" style="padding: 5;">
+                                        
+                                        <button type="button" class="btn btn-warning mb-2" onclick="deleteActivity(<?php echo $row['ActivityID']; ?>)">Delete </button>
+                                    </div>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -94,5 +99,26 @@ if (!$result) {
         </div>
     </div>
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function deleteActivity(ActivityID) {
+        console.log("Deleting activity with ID: " + ActivityID);
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will not be able to recover this.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to delete-activities.php with ActivityID
+                window.location.href = '../Committee/delete-activities.php?ActivityID=' + ActivityID;
+            }
+        });
+    }
+</script>
 
 <?php include('include/footer.php'); ?>

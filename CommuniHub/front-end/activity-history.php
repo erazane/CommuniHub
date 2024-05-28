@@ -60,6 +60,7 @@ if (!$result) {
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
+                            <th scope="col">No</th>
                             <th scope="col">Title</th>
                             <th scope="col">Location</th>
                             <th scope="col">Date</th>
@@ -68,8 +69,11 @@ if (!$result) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                        <?php
+                        $counter=1;
+                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr>
+                                <td><?php echo $counter++ ?></td>
                                 <td><?php echo $row['Activityname']; ?></td>
                                 <td style="text-align: justify;"><?php echo $row['ActivityLocation']; ?></td>
                                 <td><?php echo $row['ActivityDate']; ?></td>

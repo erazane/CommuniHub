@@ -3,6 +3,13 @@ include('include/header.php');
 session_start();
 require_once('../Database/database.php');
 
+
+if (isset($_SESSION['status']) && isset($_SESSION['status_code'])) {
+    echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['status']) . '", "' . htmlspecialchars($_SESSION['status_code']) . '");</script>';
+    unset($_SESSION['status']);
+    unset($_SESSION['status_code']);
+}
+
 if (isset($_GET['UserID']) && isset($_GET['DonationID'])) {
     $UserID = $_GET['UserID'];
     $DonationID = $_GET['DonationID'];
@@ -39,20 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "Error: " . mysqli_error($dbc);
 }
 
-        // //retrive user information for donation
-        // $query = "SELECT DonationTotal, DonationMessage FROM donationjoined WHERE DonationID = $DonationID AND UserID = $UserID";
-        // $result = mysqli_query($dbc, $query);
-        
-        // if ($result && mysqli_num_rows($result) > 0) {
-        //     // Fetch donation total
-        //     $donationData = mysqli_fetch_assoc($result);
-        //     $DonationTotal = $donationData['DonationTotal'];
-        //     // Check if DonationMessage is set before accessing its value
-        //     $DonationMessage = isset($donationData['DonationMessage']) ? $donationData['DonationMessage'] : null;
-        // } else {
-        //     // Handle case where no donation data is found
-        //     echo "No donation data found.";
-        // }
+if (isset($_POST['DonationTotal']) && isset($_POST['DonationMessage']) && isset($_POST['CardHolder']) && isset($_POST['cardType'])
+    && isset($_POST['CardNumber']) && isset($_POST['expmonth']) && isset($_POST['CVV'])) {
+    $UserID = $_SESSION["UserID"];  // Assuming the UserID is stored in the session
+    $DonationTotal = $_POST['DonationTotal'];
+    $DonationMessage = $_POST['DonationMessage'];
+    $CardHolder = $_POST['CardHolder'];
+    $cardType = $_POST['cardType'];
+    $CardNumber = $_POST['CardNumber'];
+    $expmonth = $_POST['expmonth'];
+    $CVV = $_POST['CVV'];
+    $paymentdate = date("Y-m-d H:i:s");  // Get the current date and time
+      
 }
 ?>
 
@@ -183,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <hr>
                         <div class="payment-options">
                                     <button type="button" onclick="history.back();" class="btn btn-primary btn-lg">Back</button>
-                                    <button type="button" onclick="confirmJoin();" class="btn btn-primary btn-lg">Proceed</button>
+                                    <button type="button" onclick="confirmPayment();" class="btn btn-primary btn-lg">Proceed</button>
                                 </div>
                     </div>
                 </div>
@@ -211,66 +216,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </script>
 
 <script>
-     function confirmJoin() {
-    console.log("Function called"); // Check if function is being called
-    // Validate form fields
-    var DonationTotal = document.getElementById("DonationTotal").value.trim();
-    var $DonationMessage = document.getElementById("$DonationMessage").value.trim();
-    var CardHolder = document.getElementById("CardHolder").value.trim();
-    var cardType = document.querySelector('input[name="cardType"]:checked');
-    var CardNumber = document.getElementById("CardNumber").value.trim();
-    var expmonth = document.getElementById("expmonth").value.trim();
-    var CVV = document.getElementById("CVV").value.trim();
+    function confirmPayment(){
+        var DonationTotal = document.getElementById("DonationTotal").value.trim();
+        var $DonationMessage = document.getElementById("$DonationMessage").value.trim();
+        var CardHolder = document.getElementById("CardHolder").value.trim();
+        var cardType = document.querySelector('input[name="cardType"]:checked');
+        var CardNumber = document.getElementById("CardNumber").value.trim();
+        var expmonth = document.getElementById("expmonth").value.trim();
+        var CVV = document.getElementById("CVV").value.trim();
 
-    console.log(CardHolder, cardType, CardNumber, expmonth, CVV); // Check form field values
+        console.log(CardHolder, cardType, CardNumber, expmonth, CVV);
 
-    // Display SweetAlert confirmation prompt
-    Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to proceed with this payment?",
-        icon: "info",
-        buttons: true,
-        dangerMode: true,
-    }).then((willJoin) => {
-        console.log("SweetAlert confirmed:", willJoin); // Check if user confirms or cancels
-        if (willJoin) {
-            // If the user confirms, insert data into the donationjoined table
-            var UserID = <?php echo json_encode($_SESSION["UserID"]); ?>;
-            var DonationID = <?php echo json_encode($_GET["DonationID"]); ?>;
-            
-            // Ajax call to insert data into donationjoined table
-            $.ajax({
-                type: "POST",
-                url: "insert-cardDetails.php",
-                data: {UserID: UserID, DonationID: DonationID, CardHolder: CardHolder , cardType :cardType, 
-                    CardNumber : CardNumber , expmonth:expmonth ,CVV:CVV  ,DonationMessage:$DonationMessage, DonationTotal:DonationTotal},
-                success: function(response) {
-                    swal({
-                        title: "Payment Successful!",
-                        text: "Thank you for your donation.",
-                        icon: "success",
-                        button: "OK",
-                    }).then(() => {
-                        var url = `receipt.php?DonationID=${DonationID}&UserID=${UserID}`;
-                        console.log('Form submitted');
-                        console.log("Redirecting to:", url); // Check the URL being redirected to
-                        window.location.href = url;
-                    });
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error:", error); // Log any errors
-                }
-            });
-        } else {
-            // If the user cancels, do nothing
-            console.log("User cancelled.");
-        }
-    });
-}
+        if(DonationTotal=="" || $DonationMessage==""|| $CardHolder=="" || 
+            cardType=="" || CardNumber=="" ||expmonth==""|| CVV==""){
+                swal("Error!", "Please fill out all required fields.", "error");
+                 return;
+            }
 
-
-                        </script>
+            swal({
+               title :"Would you like to proceed with this payment?" ,
+               text : "Click confirm if you wish to proceed",
+               icon :"info",
+               button : true,
+               dangerMode: true,
+            }).then((willProceed) => {
+            if (willProceed) {
+                document.getElementById("confirmPayment").submit();
+            } else {
+                console.log("User cancelled.");
+            }
+        });
+    }
+</script>
 
 
 <?php include('include/footer.php'); ?>
-

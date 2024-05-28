@@ -109,7 +109,7 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
                                     // Unset the session variable
                                     unset($_SESSION['success']);
                                 }
-                            ?>
+                            ?>./
                             <div class="form-group">
                                 <label for="ComplainTitle">Title:</label>
                                 <input type="text" class="form-control" id="ComplainTitle" name="ComplainTitle" required>
