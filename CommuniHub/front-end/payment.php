@@ -41,7 +41,14 @@ if ($result) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['DonationTotal'], $_POST['CardHolder'], $_POST['cardType'], $_POST['CardNumber'], $_POST['expmonth'], $_POST['CVV'])) {
+    if (
+        isset($_POST['DonationTotal']) && 
+        isset($_POST['CardHolder']) &&
+        isset($_POST['cardType']) &&
+        isset($_POST['CardNumber']) &&
+        isset($_POST['expmonth']) &&
+        isset($_POST['CVV'])
+    ) {
         $DonationTotal = $_POST['DonationTotal'];
         $DonationMessage = isset($_POST['DonationMessage']) ? $_POST['DonationMessage'] : '';
         $CardHolder = $_POST['CardHolder'];
@@ -91,24 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <h4 class="card-header">Donation Amount</h4>
                             </div>
                             <div class="card-body">
-                                <form id="amount" method="POST" enctype="multipart/form-data">
-                                    <div class="row">
-                                        <div class="col-md-5">
-                                            <div class="form-group">
-                                                <label for="DonationTotal">Donation Amount:</label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" id="DonationTotal" name="DonationTotal" placeholder="Enter Amount">
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-5 offset-md-2">
-                                            <div class="form-group">
-                                                <label for="DonationMessage">Message:</label>
-                                                <input type="text" class="form-control" id="DonationMessage" name="DonationMessage" placeholder="Optional">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                                
                             </div>
                         </div>
                         <!-- Credit/Debit Card Payment Form -->
@@ -119,6 +109,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="card-body">
                                 <form id="paymentdetails" method="POST" enctype="multipart/form-data">
                                     <h3>Card Details</h3>
+                                    <div class="form-group">
+                                        <label for="DonationTotal">Donation Amount:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="DonationTotal" name="DonationTotal" placeholder="Enter Amount">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="DonationMessage">Message:</label>
+                                        <input type="text" class="form-control" id="DonationMessage" name="DonationMessage" placeholder="Optional">
+                                    </div>
                                     <div class="form-group">
                                         <label for="CardHolder">Name on card:</label>
                                         <div class="input-group">
@@ -263,6 +263,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         var CardNumber = document.getElementById("CardNumber").value.trim();
         var expmonth = document.getElementById("expmonth").value.trim();
         var CVV = document.getElementById("CVV").value.trim();
+
+        console.log(
+            'swol data: ',
+            DonationTotal,
+            DonationMessage,
+            CardHolder,
+            cardType,
+            CardNumber,
+            expmonth,
+            CVV,
+        )
 
         if (!DonationTotal || !CardHolder || !cardType || !CardNumber || !expmonth || !CVV) {
             swal("Error!", "Please fill out all required fields.", "error");
