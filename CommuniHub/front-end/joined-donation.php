@@ -20,7 +20,7 @@ require_once('include/header.php');
         }
 
         // Retrieve user information based on UserID
-        $query = "SELECT UserFirstName, UserLastName, UserEmail, UserContactDetails FROM user WHERE UserID = $UserID";
+        $query = "SELECT UserFirstName, UserLastName  FROM user WHERE UserID = $UserID";
         $result = mysqli_query($dbc, $query);
 
         if ($result) {
@@ -28,8 +28,6 @@ require_once('include/header.php');
             $userData = mysqli_fetch_assoc($result);
             $UserFirstName = $userData['UserFirstName'];
             $UserLastName = $userData['UserLastName'];
-            $UserEmail = $userData['UserEmail'];
-            $UserContactDetails = $userData['UserContactDetails'];
         } else {
             echo "Error: " . mysqli_error($dbc);
         }
@@ -45,6 +43,23 @@ require_once('include/header.php');
             $image = isset($row['image']) ? $row['image'] : '';
             $DonationName = isset($row['DonationName']) ? $row['DonationName'] : '';
         }
+
+        $query ="SELECT DonationTotal,DonationMessage,CardHolder,cardType,DateJoined
+                FROM donationjoined WHERE DonationID = $DonationID AND UserID = $UserID";
+        $result = mysqli_query($dbc,$query);
+
+        if($result){
+            $row=mysqli_fetch_assoc($result);
+                $DonationTotal = $userData['DonationTotal'];
+                $DonationMessage = $userData['DonationMessage'];
+                $CardHolder = $userData['CardHolder'];
+                $cardType = $userData['cardType'];
+                $DateJoined = $userData['DateJoined'];
+            }else{
+                echo "Error: " . mysqli_error($dbc);
+            }
+    
+        
     ?>
 
     <!-- end php -->
@@ -82,7 +97,7 @@ require_once('include/header.php');
                 <div class="card">
                     <div class="card-body">
                         <form id="donationForm" action="payment.php" method="POST" enctype="multipart/form-data">
-                            <h4><strong>Fill out the form below to support the cause with your generous donation.</strong></h4>
+                            <h4><strong>Summary</strong></h4>
                             <hr>
                             <div class="form-group">
                                 <label for="UserFirstName">First Name:</label>
@@ -92,17 +107,15 @@ require_once('include/header.php');
                                 <label for="UserLastName">Last Name:</label>
                                 <input type="text" class="form-control" id="UserLastName" name="UserLastName" value="<?php echo $UserLastName; ?>" required>
                             </div>
+                            <hr>
                             <div class="form-group">
-                                <label for="UserEmail">Email:</label>
-                                <input type="email" class="form-control" id="UserEmail" name="UserEmail" value="<?php echo $UserEmail; ?>" required>
+                                <label for="CardHolder">Card Holder:</label>
+                                <input type="text" class="form-control" id="CardHolder" name="CardHolder" value="<?php echo $CardHolder; ?>" required>
                             </div>
                             <div class="form-group">
-                                <label for="UserContactDetails">Contact Detail:</label>
+                                <label for="cardType">Card Type:</label>
                                 <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa fa-phone" aria-hidden="true"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" id="UserContactDetails" name="UserContactDetails" value="<?php echo $UserContactDetails; ?>" required>
+                                    <input type="text" class="form-control" id="cardType" name="cardType" value="<?php echo $cardType; ?>" required>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -111,57 +124,29 @@ require_once('include/header.php');
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">RM</span>
                                     </div>
-                                    <input type="text" class="form-control" id="DonationTotal" name="DonationTotal" placeholder="Enter Amount" required>
+                                    <input type="text" class="form-control" id="DonationTotal" name="DonationTotal"  value="<?php echo $DonationTotal; ?>" required>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="DonationMessage">Message:</label>
-                                <textarea class="form-control" id="DonationMessage" name="DonationMessage" rows="7" placeholder="Optional"></textarea>
+                                <input type="text" class="form-control" id="DonationMessage" name="DonationMessage" value="<?php echo $DonationMessage; ?>" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="DateJoined">Donate On:</label>
+                                <input type="text" class="form-control" id="DateJoined" name="DateJoined" value="<?php echo $DateJoined; ?>" required>
                             </div>
 
                             <input type="hidden" name="DonationID" value="<?php echo $DonationID; ?>">
                             <input type="hidden" name="UserID" value="<?php echo $UserID; ?>">
                             <hr>
                             <div class="text-right">
-                                <a href="donations.php" class="btn btn-primary btn-lg">Back</a>
-                                <button type="button" onclick="validateForm()" class="btn btn-primary btn-lg">Proceed</button>
+                                <a href="donations.php" class="btn btn-primary btn-lg mt-3">Back</a>
+                                <a href="generate-pdf.php" class="btn btn-primary btn-lg  mt-3">Generate PDF</a> 
                             </div>
 
                             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                             <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
                             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                            <script>
-                                function validateForm() {
-                                    var UserFirstName = document.getElementById("UserFirstName").value.trim();
-                                    var UserLastName = document.getElementById("UserLastName").value.trim();
-                                    var UserEmail = document.getElementById("UserEmail").value.trim();
-                                    var UserContactDetails = document.getElementById("UserContactDetails").value.trim();
-                                    var DonationTotal = document.getElementById("DonationTotal").value.trim();
-                                    var DonationMessage = document.getElementById("DonationMessage").value.trim();
-
-                                    if (UserFirstName === "" || UserLastName === "" || UserEmail === "" || UserContactDetails === "" || DonationTotal === "") {
-                                        Swal.fire(
-                                            "Error!",
-                                            "Please fill out all required fields.",
-                                            "error"
-                                        );
-                                        return; // Stop further execution
-                                    }
-
-                                    Swal.fire({
-                                        title: "Are you sure?",
-                                        text: "Do you want to proceed with this donation?",
-                                        icon: "info",
-                                        showCancelButton: true,
-                                        confirmButtonText: "Proceed",
-                                        cancelButtonText: "Cancel"
-                                    }).then((result) => {
-                                        if (result.isConfirmed) {
-                                            document.getElementById("donationForm").submit();
-                                        }
-                                    });
-                                }
-                            </script>
                         </form>
                     </div>
                 </div>
