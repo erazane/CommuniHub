@@ -3,11 +3,7 @@ session_start();
 require_once('include/header.php'); 
 require_once('../Database/database.php');
 
-if (isset($_SESSION['status']) && isset($_SESSION['status_code'])) {
-    echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['status']) . '", "' . htmlspecialchars($_SESSION['status_code']) . '");</script>';
-    unset($_SESSION['status']);
-    unset($_SESSION['status_code']);
-}
+
 
 if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_POST['ComplaintType'])) {
     $UserID = $_SESSION["UserID"];  // Assuming the UserID is stored in the session
@@ -42,7 +38,7 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
         $insertResult = mysqli_query($dbc, $query);
 
         if ($insertResult) {
-            $_SESSION['status'] = "Inserted successfully!";
+            $_SESSION['status'] = "Complaint Successful";
             $_SESSION['status_code'] = "success";
         } else {
             $_SESSION['status'] = "Error: " . mysqli_error($dbc);
@@ -145,7 +141,7 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
                         <h5>Your voice matters to make our community a better place.</h5>
                         <div class="text-right">
                             <a href="UserProfile-read.php" class="btn btn-secondary btn-lg">Back</a>
-                            <a href="pendingComplaint.php" class="btn btn-primary btn-lg">Pending</a>
+                            <a href="pending-complaints.php" class="btn btn-primary btn-lg">Pending</a>
                         </div>
                     </div>
                 </div>

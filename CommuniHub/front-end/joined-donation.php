@@ -3,64 +3,59 @@ session_start();
 require_once('include/header.php'); 
 ?>
 </div>
-    <!-- start donation form -->
+<?php
 
-    <!-- start php -->
+// Establish database connection
+require_once('../Database/database.php');
 
-    <?php
-        // error_reporting(E_ALL);
-        require_once ('../Database/database.php');
-        
-        // Retrieve from URL parameter
-        $UserID = $_GET["UserID"];
-        $DonationID = $_GET["DonationID"];
+// Check if UserID and DonationID are set in the URL
+if(isset($_GET["UserID"]) && isset($_GET["DonationID"])) {
+    $UserID = $_GET["UserID"];
+    $DonationID = $_GET["DonationID"];
 
-        if(!isset($_SESSION["UserID"])) {
-            $_SESSION["UserID"] = $UserID; // Set UserID in session if it's not already set
-        }
+    // Retrieve user information based on UserID
+    $query_user = "SELECT UserFirstName, UserLastName FROM user WHERE UserID = $UserID";
+    $result_user = mysqli_query($dbc, $query_user);
 
-        // Retrieve user information based on UserID
-        $query = "SELECT UserFirstName, UserLastName  FROM user WHERE UserID = $UserID";
-        $result = mysqli_query($dbc, $query);
+    if ($result_user && mysqli_num_rows($result_user) > 0) {
+        $userData = mysqli_fetch_assoc($result_user);
+        $UserFirstName = $userData['UserFirstName'];
+        $UserLastName = $userData['UserLastName'];
+    } else {
+        echo "Error: " . mysqli_error($dbc);
+    }
 
-        if ($result) {
-            // Fetch user information
-            $userData = mysqli_fetch_assoc($result);
-            $UserFirstName = $userData['UserFirstName'];
-            $UserLastName = $userData['UserLastName'];
-        } else {
-            echo "Error: " . mysqli_error($dbc);
-        }
+    // Retrieve the donation details based on DonationID
+    $query_donation = "SELECT DonationDesc, image, DonationName FROM donation WHERE DonationID = $DonationID";
+    $result_donation = mysqli_query($dbc, $query_donation);
 
-        // Retrieve the description and image for the summary page
-        $query = "SELECT DonationDesc, image, DonationName FROM donation WHERE DonationID = $DonationID";
-        $result = mysqli_query($dbc, $query);
+    if($result_donation && mysqli_num_rows($result_donation) > 0) {
+        $row_donation = mysqli_fetch_assoc($result_donation);
+        $DonationDesc = isset($row_donation['DonationDesc']) ? $row_donation['DonationDesc'] : ''; 
+        $image = isset($row_donation['image']) ? $row_donation['image'] : '';
+        $DonationName = isset($row_donation['DonationName']) ? $row_donation['DonationName'] : '';
+    }
 
-        if($result && mysqli_num_rows($result)){
-            // Fetch the description
-            $row = mysqli_fetch_assoc($result);
-            $DonationDesc = isset($row['DonationDesc']) ? $row['DonationDesc'] : ''; 
-            $image = isset($row['image']) ? $row['image'] : '';
-            $DonationName = isset($row['DonationName']) ? $row['DonationName'] : '';
-        }
+    // Retrieve joined donation details
+    $query_joined = "SELECT DonationTotal, DonationMessage, CardHolder, cardType, DateJoined
+            FROM donationjoined 
+            WHERE DonationID = $DonationID AND UserID = $UserID";
+    $result_joined = mysqli_query($dbc, $query_joined);
 
-        $query ="SELECT DonationTotal,DonationMessage,CardHolder,cardType,DateJoined
-                FROM donationjoined WHERE DonationID = $DonationID AND UserID = $UserID";
-        $result = mysqli_query($dbc,$query);
-
-        if($result){
-            $row=mysqli_fetch_assoc($result);
-                $DonationTotal = $userData['DonationTotal'];
-                $DonationMessage = $userData['DonationMessage'];
-                $CardHolder = $userData['CardHolder'];
-                $cardType = $userData['cardType'];
-                $DateJoined = $userData['DateJoined'];
-            }else{
-                echo "Error: " . mysqli_error($dbc);
-            }
-    
-        
-    ?>
+    if($result_joined && mysqli_num_rows($result_joined) > 0) {
+        $row_joined = mysqli_fetch_assoc($result_joined);
+        $DonationTotal = $row_joined['DonationTotal'];
+        $DonationMessage = $row_joined['DonationMessage'];
+        $CardHolder = $row_joined['CardHolder'];
+        $cardType = $row_joined['cardType'];
+        $DateJoined = $row_joined['DateJoined'];
+    } else {
+        echo "Error: " . mysqli_error($dbc);
+    }
+} else {
+    echo "UserID and DonationID are not set.";
+}
+?>
 
     <!-- end php -->
 

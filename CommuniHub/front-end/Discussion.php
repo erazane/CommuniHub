@@ -7,7 +7,6 @@ require_once('include/header.php');
 require_once('../Database/database.php'); // Include database connection file
 
 // Get the selected filter values from the form submission
-$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
 $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
 // Fetch data for discussions/complaints with filters
@@ -17,10 +16,7 @@ $query = "
     JOIN user u ON d.UserID = u.UserID
 ";
 
-// Add filter for type of discussion
-if ($filterType) {
-    $query .= " WHERE d.type = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
-}
+
 
 // Add order by clause
 $query .= " ORDER BY d.DiscussionID $filterOrder";
@@ -35,6 +31,18 @@ $discussions = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $discussions[] = $row;
 }
+
+//    // query for activity joined
+//    $query = "SELECT COUNT(*) AS replyCount FROM discussionreplies WHERE DiscussionID = $DiscussionID";
+//    $result = mysqli_query($dbc, $query);
+
+//    if($result){
+//      $row = mysqli_fetch_assoc($result);
+//       $activityCount=$row['activity_count'];
+//    }else{
+//      $activityCount = 0;  
+//    }
+
 ?>
 
 <br>
@@ -42,7 +50,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="heading_container heading_center">
-                <h2>Schedule Dashboard</h2>
+                <h2>Discussion Board</h2>
                 <hr style="width: 350px; text-align: center">
             </div>
         </div>
@@ -55,16 +63,6 @@ while ($row = mysqli_fetch_assoc($result)) {
         <div class="col-md-9">
             <!-- Filter Form -->
             <form class="form-inline justify-content-end" method="GET" action="">
-                <div class="form-group mb-2">
-                    <label for="filterType" class="mr-2">Type:</label>
-                    <select class="form-control" id="filterType" name="filterType">
-                        <option value="" <?php if ($filterType == '') echo 'selected'; ?>>All</option>
-                        <option value="Safety & Wellbeing" <?php if ($filterType == 'Safety & Wellbeing') echo 'selected'; ?>>Safety & Wellbeing</option>
-                        <option value="Infrastructure" <?php if ($filterType == 'Infrastructure') echo 'selected'; ?>>Infrastructure</option>
-                        <option value="Noise" <?php if ($filterType == 'Noise') echo 'selected'; ?>>Noise</option>
-                        <option value="Public Services" <?php if ($filterType == 'Public Services') echo 'selected'; ?>>Public Services</option>
-                    </select>
-                </div>
                 <div class="form-group mx-sm-3 mb-2">
                     <label for="filterOrder" class="mr-2">Order:</label>
                     <select class="form-control" id="filterOrder" name="filterOrder">
@@ -97,8 +95,10 @@ while ($row = mysqli_fetch_assoc($result)) {
                                     <p>Complaint Description: <?php echo htmlspecialchars($discussion['ComplaintDescription']); ?></p>
 
                                     <div class="text-left">
-                                        <a href="" class="btn btn-secondary mt-3">Back</a> 
-                                        <a href="reply.php" class="btn btn-primary mt-3">Reply</a> 
+                                        <p class='card-text'><small class='text-muted'>Replies: <?php echo htmlspecialchars($discussion['replyCount']); ?></small></p>
+                                    </div>
+                                    <div class="text-right">
+                                        <a href="replies.php?discussionID=<?php echo htmlspecialchars($discussion['DiscussionID']); ?>&userID=<?php echo htmlspecialchars($_SESSION['UserID']); ?>" class="btn btn-primary mt-3">Reply</a>
                                     </div>
                                 </div>
                             </div>

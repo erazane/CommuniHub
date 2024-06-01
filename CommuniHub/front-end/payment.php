@@ -2,19 +2,10 @@
 session_start();
 require_once('include/header.php'); 
 ?>
-
 </div>
 <?php
+require_once('../Database/database.php'); // Establish database connection
 
-// Establish database connection
-require_once('../Database/database.php');
-
-// Display success/error message if available
-if (isset($_SESSION['status']) && isset($_SESSION['status_code'])) {
-    echo '<script>swal("Success!", "' . htmlspecialchars($_SESSION['status']) . '", "' . htmlspecialchars($_SESSION['status_code']) . '");</script>';
-    unset($_SESSION['status']);
-    unset($_SESSION['status_code']);
-}
 
 // Get UserID and DonationID from URL parameters
 if (isset($_GET['UserID']) && isset($_GET['DonationID'])) {
@@ -25,6 +16,46 @@ if (isset($_GET['UserID']) && isset($_GET['DonationID'])) {
 // Set UserID in session if not already set
 if (!isset($_SESSION["UserID"])) {
     $_SESSION["UserID"] = $_GET['UserID'];
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo"heh";
+    if (
+        isset($_POST['DonationTotal']) && 
+        isset($_POST['CardHolder']) &&
+        isset($_POST['cardType']) &&
+        isset($_POST['CardNumber']) &&
+        isset($_POST['expmonth']) &&
+        isset($_POST['CVV'])
+    ) {
+        $DonationTotal = $_POST['DonationTotal'];
+        $CardHolder = $_POST['CardHolder'];
+        $cardType = $_POST['cardType'];
+        $CardNumber = $_POST['CardNumber'];
+        $expmonth = $_POST['expmonth'] . '-01';
+        $CVV = $_POST['CVV'];
+        $DateJoined = date("Y-m-d H:i:s");
+
+        // Prepare the insert query
+        $insertQuery = "INSERT INTO donationjoined (DateJoined, DonationTotal, DonationID, UserID, CardHolder, cardType, CardNumber, expmonth, CVV)
+                        VALUES ('$DateJoined', '$DonationTotal', '$DonationID', '$UserID', '$CardHolder', '$cardType', '$CardNumber', '$expmonth', '$CVV')";
+
+        // Execute the insert query
+        $insertResult = mysqli_query($dbc, $insertQuery);
+
+        if ($insertResult) {
+            $_SESSION['paid'] = "Donation successful !";
+            $_SESSION['paid_code'] = "success";
+            header('Location: joined-donation.php?DonationID='.$DonationID.'&UserID='.$UserID);
+            exit;
+        } else {
+            $_SESSION['paid'] = "An error occurred while processing your donation.";
+            $_SESSION['paid_code'] = "error";
+            // Redirect back to the payment page to display the error message
+            header('Location: payment.php?DonationID='.$DonationID.'&UserID='.$UserID);
+            exit;
+        }
+    }        
 }
 
 // Fetch donation details
@@ -40,49 +71,7 @@ if ($result) {
     echo "Error: " . mysqli_error($dbc);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (
-        isset($_POST['DonationTotal']) && 
-        isset($_POST['CardHolder']) &&
-        isset($_POST['cardType']) &&
-        isset($_POST['CardNumber']) &&
-        isset($_POST['expmonth']) &&
-        isset($_POST['CVV'])
-    ) {
-        $DonationTotal = $_POST['DonationTotal'];
-        $DonationMessage = isset($_POST['DonationMessage']) ? $_POST['DonationMessage'] : '';
-        $CardHolder = $_POST['CardHolder'];
-        $cardType = $_POST['cardType'];
-        $CardNumber = $_POST['CardNumber'];
-        $expmonth = $_POST['expmonth'];
-        $CVV = $_POST['CVV'];
-        $DateJoined = date("Y-m-d H:i:s");
-
-        if (!empty($DonationTotal) && !empty($CardHolder) && !empty($cardType) && !empty($CardNumber) && !empty($expmonth) && !empty($CVV)) {
-            $insertQuery = "INSERT INTO donationjoined (DateJoined, DonationMessage, DonationTotal, DonationID, UserID, CardHolder, cardType, CardNumber, expmonth, CVV)
-                            VALUES ('$DateJoined', '$DonationMessage', '$DonationTotal', '$DonationID', '$UserID', '$CardHolder', '$cardType', '$CardNumber', '$expmonth', '$CVV')";
-            $insertResult = mysqli_query($dbc, $insertQuery);
-
-            if ($insertResult) {
-                $_SESSION['status'] = "Inserted successfully!";
-                $_SESSION['status_code'] = "success";
-            } else {
-                $_SESSION['status'] = "Error: " . mysqli_error($dbc);
-                $_SESSION['status_code'] = "error";
-            }
-        } else {
-            $_SESSION['status'] = "Please fill out all required fields.";
-            $_SESSION['status_code'] = "error";
-        }
-
-        // Redirect to the same page to show the message
-        header('Location: ' . $_SERVER['PHP_SELF'] . '?UserID=' . $UserID . '&DonationID=' . $DonationID);
-        exit;
-    }
-}
-
 ?>
-
 
 <section class="service_section layout_padding">
     <div class="container" style="max-width: 1200px; padding: 2%;">
@@ -93,31 +82,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
-                        <div class="card">
-                            <div class="text-center">
-                                <h4 class="card-header">Donation Amount</h4>
-                            </div>
-                            <div class="card-body">
-                                
-                            </div>
-                        </div>
                         <!-- Credit/Debit Card Payment Form -->
                         <div class="card">
                             <div class="text-center">
                                 <h4 class="card-header">Credit/Debit Card Payment</h4>
                             </div>
                             <div class="card-body">
-                                <form id="paymentdetails" method="POST" enctype="multipart/form-data">
+                                <form id="paymentdetails"  method="POST">
                                     <h3>Card Details</h3>
                                     <div class="form-group">
                                         <label for="DonationTotal">Donation Amount:</label>
                                         <div class="input-group">
                                             <input type="text" class="form-control" id="DonationTotal" name="DonationTotal" placeholder="Enter Amount">
                                         </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="DonationMessage">Message:</label>
-                                        <input type="text" class="form-control" id="DonationMessage" name="DonationMessage" placeholder="Optional">
                                     </div>
                                     <div class="form-group">
                                         <label for="CardHolder">Name on card:</label>
@@ -254,10 +231,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         let value = event.target.value;
         event.target.value = value.replace(/\D/g, "");
     });
+  document.getElementById("DonationTotal").addEventListener("input", function(event) {
+        let value = event.target.value;
+        event.target.value = value.replace(/\D/g, "");
+    });
 
     function confirmPayment(DonationID) {
         var DonationTotal = document.getElementById("DonationTotal").value.trim();
-        var DonationMessage = document.getElementById("DonationMessage").value.trim();
         var CardHolder = document.getElementById("CardHolder").value.trim();
         var cardType = document.querySelector('input[name="cardType"]:checked');
         var CardNumber = document.getElementById("CardNumber").value.trim();
@@ -267,16 +247,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         console.log(
             'swol data: ',
             DonationTotal,
-            DonationMessage,
             CardHolder,
             cardType,
             CardNumber,
             expmonth,
             CVV,
         )
-
         if (!DonationTotal || !CardHolder || !cardType || !CardNumber || !expmonth || !CVV) {
-            swal("Error!", "Please fill out all required fields.", "error");
+            Swal.fire("Error!", "Please fill out all required fields.", "error");
             return;
         }
 

@@ -123,6 +123,27 @@ if(isset($_SESSION['status']) && $_SESSION['status'] !='')
 }
 ?>
 
+
+<?php
+if(isset($_SESSION['paid']) && $_SESSION['paid'] !='')
+{
+  ?>
+  <script>
+    swal({
+          title: '<?php echo $_SESSION['paid'];?>',
+          icon: '<?php echo $_SESSION['paid_code'];?>',
+          button: "Confirm",
+        });
+    </script>
+
+    <?php
+    unset($_SESSION['paid']);
+     
+
+}
+?>
+
+
 <script>
 <?php
 if(isset($_SESSION['profile_status']) && $_SESSION['profile_status_code'] !='') {
