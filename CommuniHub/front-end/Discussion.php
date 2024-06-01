@@ -9,17 +9,23 @@ require_once('../Database/database.php'); // Include database connection file
 // Get the selected filter values from the form submission
 $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
+// Define the number of discussions per page
+$discussionsPerPage = 10;
+
+// Calculate the offset
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$offset = ($page - 1) * $discussionsPerPage;
+
 // Fetch data for discussions/complaints with filters
 $query = "
-    SELECT d.DiscussionID, d.title AS ComplainTitle, d.description AS ComplaintDescription, d.date AS ComplaintDate, u.UserFirstName, u.UserLastName
+    SELECT d.DiscussionID, d.title AS ComplainTitle, d.description AS ComplaintDescription, d.date AS ComplaintDate, u.UserFirstName, u.UserLastName, u.image AS image, COUNT(dr.DiscussionRepliesID) AS replyCount
     FROM discussion d
     JOIN user u ON d.UserID = u.UserID
+    LEFT JOIN discussionreplies dr ON d.DiscussionID = dr.DiscussionID
 ";
 
-
-
 // Add order by clause
-$query .= " ORDER BY d.DiscussionID $filterOrder";
+$query .= " GROUP BY d.DiscussionID ORDER BY d.DiscussionID $filterOrder LIMIT $offset, $discussionsPerPage";
 
 $result = mysqli_query($dbc, $query);
 
@@ -31,22 +37,11 @@ $discussions = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $discussions[] = $row;
 }
-
-//    // query for activity joined
-//    $query = "SELECT COUNT(*) AS replyCount FROM discussionreplies WHERE DiscussionID = $DiscussionID";
-//    $result = mysqli_query($dbc, $query);
-
-//    if($result){
-//      $row = mysqli_fetch_assoc($result);
-//       $activityCount=$row['activity_count'];
-//    }else{
-//      $activityCount = 0;  
-//    }
-
 ?>
 
 <br>
 <div class="container" style="max-width: 1500px;">
+<br>
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="heading_container heading_center">
@@ -82,7 +77,8 @@ while ($row = mysqli_fetch_assoc($result)) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-2">
-                                <img src="./images/profile-picture/default_profile_picture.png" style="width: 100%;" alt="Profile Picture">
+                            <img src="images/profile-picture/<?php echo $discussion['image'] ? $discussion['image'] : "default_profile_picture.png"; ?>" alt="Profile Picture" class="img-fluid rounded-circle">
+                                <!-- <img src="./images/profile-picture/default_profile_picture.png" style="width: 100%;" alt="Profile Picture"> -->
                             </div>
                             <div class="col-md-10">
                                 <div class="box">
@@ -91,11 +87,11 @@ while ($row = mysqli_fetch_assoc($result)) {
                                         <h5>Date: <?php echo htmlspecialchars($discussion['ComplaintDate']); ?></h5>
                                     </div>
                                     <br>
-                                    <h5>Complain Title: <?php echo htmlspecialchars($discussion['ComplainTitle']); ?></h5>
-                                    <p>Complaint Description: <?php echo htmlspecialchars($discussion['ComplaintDescription']); ?></p>
+                                    <h5> Title: <?php echo htmlspecialchars($discussion['ComplainTitle']); ?></h5>
+                                    <h5> <?php echo htmlspecialchars($discussion['ComplaintDescription']); ?></h5>
 
                                     <div class="text-left">
-                                        <p class='card-text'><small class='text-muted'>Replies: <?php echo htmlspecialchars($discussion['replyCount']); ?></small></p>
+                                        <h5 class='card-text'><small class='text-muted'>Replies: <?php echo htmlspecialchars($discussion['replyCount']); ?></small></h5>
                                     </div>
                                     <div class="text-right">
                                         <a href="replies.php?discussionID=<?php echo htmlspecialchars($discussion['DiscussionID']); ?>&userID=<?php echo htmlspecialchars($_SESSION['UserID']); ?>" class="btn btn-primary mt-3">Reply</a>
@@ -107,52 +103,38 @@ while ($row = mysqli_fetch_assoc($result)) {
                 </div>
             <?php endforeach; ?>
         </div>
+
+         <!-- Pagination -->
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <?php
+                        // Query for the total number of discussions
+                        $totalCountQuery = "SELECT COUNT(*) AS totalDiscussions FROM discussion";
+                        $totalCountResult = mysqli_query($dbc, $totalCountQuery);
+                        $totalCountRow = mysqli_fetch_assoc($totalCountResult);
+                        $totalDiscussions = $totalCountRow['totalDiscussions'];
+                        $totalPages = ceil($totalDiscussions / $discussionsPerPage);
+
+                        // Pagination links
+                        for ($i = 1; $i <= $totalPages; $i++) {
+                            echo "<li class='page-item'><a class='page-link' href='?page=$i&filterOrder=$filterOrder'>$i</a></li>";
+                        }
+                        ?>
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
-    
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-        </ul>
-    </nav>
 </div>
+ 
+
 
 <br>
 <br>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script>
-    function submitForm() {
-        var ComplaintDesc = document.getElementById("ComplaintDesc").value.trim();
-        var ComplainTitle = document.getElementById("ComplainTitle").value.trim();
 
-        if (ComplaintDesc === "" || ComplainTitle === "") {
-            Swal.fire(
-                "Error!",
-                "Please fill out all required fields.",
-                "error"
-            );
-            return; // Stop further execution
-        }
-
-        Swal.fire({
-            title: "Add Discussion",
-            icon: "info",
-            showCancelButton: true,
-            confirmButtonText: 'Confirm',
-            cancelButtonText: 'Cancel',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById("addDiscussionForm").submit(); // Submit the form
-            }
-        });
-    }
-</script>
 
 <?php include('include/footer.php'); ?>

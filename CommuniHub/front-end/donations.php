@@ -7,12 +7,19 @@ require_once('include/header.php');
 </div>
 
 <?php
-
-// Get user ID
 require_once('../Database/database.php');
 
 $filterType = isset($_GET['filterType']) ? $_GET['filterType'] : 'Ongoing'; // Default to 'Ongoing'
-$UserID = $_SESSION["UserID"];
+
+// Get UserID from session or URL parameter
+if (isset($_SESSION["UserID"])) {
+    $UserID = $_SESSION["UserID"];
+} elseif (isset($_GET['UserID'])) {
+    $UserID = $_GET['UserID'];
+    $_SESSION["UserID"] = $UserID; // Set UserID in session if not already set
+} else {
+    die('UserID is required');
+}
 
 // Prepare the query with the filter type
 $query = "SELECT  
@@ -33,6 +40,7 @@ if (!$result) {
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
             <h2>Active Donations</h2>
+            <hr style="width: 350px; text-align: center">
         </div>
         <div class="row justify-content-center align-items-center mt-3">
             <div class="col-md-9 d-flex justify-content-center">
@@ -48,6 +56,7 @@ if (!$result) {
                 </form>
             </div>
         </div>
+        <br>
         <div class="row">
             <?php
             $count = 0;
@@ -81,7 +90,7 @@ if (!$result) {
                             <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <br>
-                        <a href="payment.php?DonationID=<?php echo $DonationID; ?>&UserID=<?php echo $UserID; ?>" class="btn btn-primary btn-lg btn-block">Join</a>
+                        <a href="#" class="btn btn-primary btn-block md-2" onclick="confirmJoin(<?php echo $row['DonationID']; ?>, '<?php echo htmlspecialchars($UserID); ?>');">Join</a>
                     </div>
                 </div>
             </div>
@@ -100,5 +109,29 @@ if (!$result) {
         </div>
     </div>
 </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function confirmJoin(DonationID, UserID){
+        Swal.fire({
+            title: "Join this donation?",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: 'Confirm',
+            cancelButtonText: 'Cancel',
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                // If the user confirms, redirect to paymentPage.php with parameters
+                window.location.href = `paymentPage.php?DonationID=${DonationID}&UserID=${UserID}`;
+            } else {
+                // If the user cancels, do nothing
+            }
+        });
+    }
+</script>
 
 <?php include('include/footer.php'); ?>

@@ -1,6 +1,9 @@
 <?php
 session_start();
 require_once('include/header.php'); 
+?>
+</div>
+<?php
 require_once('../Database/database.php');
 
 
@@ -62,7 +65,7 @@ if (isset($_POST['ComplainTitle']) && isset($_POST['ComplaintDesc']) && isset($_
         </div>
         <div class="row">
             <div class="col-lg-3">
-                <div class="card">
+                <div class="card md-2">
                     <div class="card-body">
                         <h4 class="font-weight-bold">Fill Out the Form Below to Add a New Complaint</h4>
                         <h5>How to Make a Complaint:</h5>

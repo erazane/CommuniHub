@@ -1,28 +1,30 @@
 <?php
 session_start();
-require_once('include/header.php');
-require_once('../Database/database.php'); // Include database connection file
+require_once "include/header.php";
+require_once "../Database/database.php"; // Include database connection file
 
 // Getting the filter value from the form
-$filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
+$filterOrder = isset($_GET["filterOrder"]) ? $_GET["filterOrder"] : "DESC";
 
 // Get the discussionID from the URL
-$discussionID = isset($_GET['discussionID']) ? intval($_GET['discussionID']) : 0;
+$discussionID = isset($_GET["discussionID"])
+    ? intval($_GET["discussionID"])
+    : 0;
 
 if ($discussionID <= 0) {
-    die('Invalid Discussion ID');
+    die("Invalid Discussion ID");
 }
 
 //for the pagination
-if(isset($_GET['discussionID'])){
-    $discussionID = intval($_GET['discussionID']);
-} else{
-    $discussionID=0;
+if (isset($_GET["discussionID"])) {
+    $discussionID = intval($_GET["discussionID"]);
+} else {
+    $discussionID = 0;
 }
 
 // Check if page number is set in the URL, default to 1 if not set
-if (isset($_GET['page'])) {
-    $page = intval($_GET['page']);
+if (isset($_GET["page"])) {
+    $page = intval($_GET["page"]);
 } else {
     $page = 1;
 }
@@ -42,13 +44,13 @@ $query = "
 $result = mysqli_query($dbc, $query);
 
 if (!$result) {
-    die('Query failed: ' . mysqli_error($dbc));
+    die("Query failed: " . mysqli_error($dbc));
 }
 
 $discussion = mysqli_fetch_assoc($result);
 
 if (!$discussion) {
-    die('Discussion not found');
+    die("Discussion not found");
 }
 
 // Fetch the replies for the specific discussion
@@ -64,7 +66,7 @@ $repliesQuery = "
 $repliesResult = mysqli_query($dbc, $repliesQuery);
 
 if (!$repliesResult) {
-    die('Query failed: ' . mysqli_error($dbc));
+    die("Query failed: " . mysqli_error($dbc));
 }
 
 $replies = [];
@@ -72,21 +74,21 @@ while ($row = mysqli_fetch_assoc($repliesResult)) {
     $replies[] = $row;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['description'])) {
-        $description = mysqli_real_escape_string($dbc, $_POST['description']);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if (isset($_POST["description"])) {
+        $description = mysqli_real_escape_string($dbc, $_POST["description"]);
         $dateReplied = date("Y-m-d");
-        $userID = $_SESSION['UserID'];
+        $userID = $_SESSION["UserID"];
 
         $query = "INSERT INTO discussionreplies (description, dateReplied, UserID, DiscussionID) VALUES ('$description', '$dateReplied', '$userID', '$discussionID')";
         $result = mysqli_query($dbc, $query);
 
         if ($result) {
-            $_SESSION['success'] = "Reply added successfully!";
+            $_SESSION["success"] = "Reply added successfully!";
             header("Location: replies.php?discussionID=$discussionID");
-            exit;
+            exit();
         } else {
-            $_SESSION['error'] = "An error occurred while adding your reply.";
+            $_SESSION["error"] = "An error occurred while adding your reply.";
         }
     }
 }
@@ -96,8 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container" style="max-width: 1500px;">
     <div class="row justify-content-center">
         <div class="col-md-12">
+            <br>
             <div class="heading_container heading_center">
-                <h2>Discussion Details</h2>
+                <h2>Complain Title: <?php echo htmlspecialchars(
+                    $discussion["ComplainTitle"]
+                ); ?></h2>
                 <hr style="width: 350px; text-align: center">
             </div>
         </div>
@@ -109,20 +114,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-2">
-                            <img src="images/profile-picture/<?php echo $discussion['image'] ? $discussion['image'] : "default_profile_picture.png"; ?>" alt="Profile Picture" style="width: 100%;">
+                            <img src="images/profile-picture/<?php echo $discussion[
+                                "image"
+                            ]
+                                ? $discussion["image"]
+                                : "default_profile_picture.png"; ?>" alt="Profile Picture" class="img-fluid rounded-circle">
                         </div>
                         <div class="col-md-10">
                             <div class="box">
                                 <div class="d-flex justify-content-between">
-                                    <h5>Name: <?php echo htmlspecialchars($discussion['UserFirstName']) . ' ' . htmlspecialchars($discussion['UserLastName']); ?></h5>
-                                    <h5>Date: <?php echo htmlspecialchars($discussion['ComplaintDate']); ?></h5>
+                                    <h5>Name: <?php echo htmlspecialchars(
+                                        $discussion["UserFirstName"]
+                                    ) .
+                                        " " .
+                                        htmlspecialchars(
+                                            $discussion["UserLastName"]
+                                        ); ?></h5>
+                                    <h5>Date: <?php echo htmlspecialchars(
+                                        $discussion["ComplaintDate"]
+                                    ); ?></h5>
                                 </div>
                                 <br>
-                                <h5>Complain Title: <?php echo htmlspecialchars($discussion['ComplainTitle']); ?></h5>
-                                <p>Complaint Description: <?php echo htmlspecialchars($discussion['ComplaintDescription']); ?></p>
+                                <!-- <h5>Complain Title: <?php echo htmlspecialchars(
+                                    $discussion["ComplainTitle"]
+                                ); ?></h5> -->
+                                <h5> Description: <br><br>
+                                <?php echo htmlspecialchars(
+                                    $discussion["ComplaintDescription"]
+                                ); ?></h5><br>
                             </div>
                         </div>
-                    </div>
+                    </div>  
                 </div>
             </div>
         </div>
@@ -141,8 +163,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group mx-sm-3 mb-2">
                         <label for="filterOrder" class="mr-2">Order :</label>
                         <select class="form-control" id="filterOrder" name="filterOrder">
-                            <option value="ASC" <?php if ($filterOrder === 'ASC') echo 'selected'; ?>>Ascending</option>
-                            <option value="DESC" <?php if ($filterOrder === 'DESC') echo 'selected'; ?>>Descending</option>
+                            <option value="ASC" <?php if (
+                                $filterOrder === "ASC"
+                            ) {
+                                echo "selected";
+                            } ?>>Ascending</option>
+                            <option value="DESC" <?php if (
+                                $filterOrder === "DESC"
+                            ) {
+                                echo "selected";
+                            } ?>>Descending</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary mb-2">Apply Filter</button>
@@ -150,28 +180,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <?php if (empty($replies)): ?>
-                <p>No replies yet.</p>
-            <?php else: ?>
+                <div class="col-md-12">
+                
+                 <div class="card mb-3" style="background-color: white; display: flex; justify-content: center; align-items: center;">
+                 <br>
+                     <img src="./images/discussion.jpg" alt="Discussion Image" style="width: 350px; height: 350px;">
+                     <h4>Looks lke there's no replies yet</h4><br><br>
+                 </div>
+             </div>
+            <?php
+                // $profilePicture = isset($reply['UserImage']) && !empty($reply['UserImage']) ? $reply['UserImage'] : 'default_profile_picture.png' ;
+                // $profilePicture = isset($reply['UserImage']) && !empty($reply['UserImage']) ? $reply['UserImage'] : 'default_profile_picture.png' ;
+                else: ?>
                 <?php foreach ($replies as $reply): ?>
                     <div class="card mb-3">
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-1">
-                                    <?php 
-                                    // Use the UserImage field directly from the query result
-                                    // $profilePicture = isset($reply['UserImage']) ? $reply['UserImage'] : 'default_profile_picture.png';
-                                    $profilePicture = isset($reply['UserImage']) && !empty($reply['UserImage']) ? $reply['UserImage'] : 'default_profile_picture.png';
-                                    ?>
-                                    <img src="images/profile-picture/<?php echo htmlspecialchars($profilePicture); ?>" alt="Profile Picture" style="width: 100%;">
+                                    <?php $profilePicture =
+                                        isset($reply["UserImage"]) &&
+                                        !empty($reply["UserImage"])
+                                            ? $reply["UserImage"]
+                                            : "default_profile_picture.png"; ?>
+                                    <img src="images/profile-picture/<?php echo htmlspecialchars(
+                                        $profilePicture
+                                    ); ?>" alt="Profile Picture" class="img-fluid rounded-circle">
                                 </div>
                                 <div class="col-md-10">
                                     <div class="box">
                                         <div class="d-flex justify-content-between">
-                                            <h5>Name: <?php echo htmlspecialchars($reply['UserFirstName']) . ' ' . htmlspecialchars($reply['UserLastName']); ?></h5>
-                                            <h5>Date: <?php echo htmlspecialchars($reply['ReplyDate']); ?></h5>
+                                            <h5>Name: <?php echo htmlspecialchars(
+                                                $reply["UserFirstName"]
+                                            ) .
+                                                " " .
+                                                htmlspecialchars(
+                                                    $reply["UserLastName"]
+                                                ); ?></h5>
+                                            <h5>Date: <?php echo htmlspecialchars(
+                                                $reply["ReplyDate"]
+                                            ); ?></h5>
                                         </div>
                                         <br>
-                                        <p><?php echo htmlspecialchars($reply['ReplyDescription']); ?></p>
+                                        <p><?php echo htmlspecialchars(
+                                            $reply["ReplyDescription"]
+                                        ); ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -200,7 +252,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-    
+
 
     <!-- displaying the pagination -->
 <div class="text-center mb-3">
@@ -211,20 +263,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $totalrepliesrow = mysqli_fetch_assoc($results);
 
     if ($totalrepliesrow) {
-        $totalreplies = $totalrepliesrow['totalreplies'];
+        $totalreplies = $totalrepliesrow["totalreplies"];
 
         // Calculate the total number of pages
         $totalPages = ceil($totalreplies / $repliesPerPage);
-        
+
         echo '<div class="d-flex justify-content-between align-items-center">';
-        
+
         // Back button
         echo '<div class="text-left">';
         echo '<a href="Discussion.php" class="btn btn-primary btn-lg mr-2">Back</a>';
-        echo '</div>';
+        echo "</div>";
 
         // Pagination links
-        echo '<div>';
+        echo "<div>";
         for ($i = 1; $i <= $totalPages; $i++) {
             echo "<a href=\"?discussionID=$discussionID&page=$i&filterOrder=$filterOrder\"";
             if ($i === $page) {
@@ -234,16 +286,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             echo ">$i</a>";
         }
-        echo '</div>';
-        
-        echo '</div>'; // Close d-flex
+        echo "</div>";
+
+        echo "</div>"; // Close d-flex
     } else {
         echo "No replies found.";
     }
     ?>
 </div>
 </div>
-    
+
 
 
 <br>
@@ -284,4 +336,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 </script>
 
-<?php include('include/footer.php'); ?>
+<?php include "include/footer.php"; ?>
