@@ -7,13 +7,14 @@ include('include/header.php');
 <?php
 require_once('../Database/database.php');
 
-// Make the query to retrieve activity details
+// Make the query to retrieve donation details
 $query = "
-    SELECT a.ActivityID, a.Activityname, a.ActivityDate, a.ActivityTime, a.ActivityType,
-           COUNT(aj.UserID) AS NumJoined
-    FROM activities a
-    LEFT JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID WHERE a.Status = 'Ongoing'
-    GROUP BY a.ActivityID, a.Activityname, a.ActivityDate, a.ActivityTime, a.ActivityType
+    SELECT d.DonationID, d.DonationName, d.DonationStartDate,
+           COUNT(dj.UserID) AS NumJoined
+    FROM donation d
+    LEFT JOIN donationjoined dj ON d.DonationID = dj.DonationID
+    WHERE d.Status = 'Ongoing'
+    GROUP BY d.DonationID, d.DonationName, d.DonationStartDate
 ";
 
 $result = mysqli_query($dbc, $query); // Run the query
@@ -27,7 +28,7 @@ if (!$result) {
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
-            <h2>Activity Dashboard</h2>
+            <h2>Donation Dashboard</h2>
             <hr>
         </div>
         <div class="row">
@@ -35,16 +36,16 @@ if (!$result) {
                 <div class="pillbox border">
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="manage-activities.php">Current Activities</a>
+                            <a class="nav-link " href="manage-donation.php">Current Donation</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link active" href="activities-joined.php"> Activities joined</a>
+                            <a class="nav-link active" href="joined-donation.php">Donations Joined</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="add-activities.php">Add Activities</a>
+                            <a class="nav-link" href="add-donation.php">Add Donations</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="activities-history.php">History</a>
+                            <a class="nav-link" href="donation-history.php">History</a>
                         </li>
                     </ul>
                 </div>
@@ -53,15 +54,15 @@ if (!$result) {
                 <div id="accordion">
                     <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                         <div class="card">
-                            <div class="card-header" id="heading<?php echo $row['ActivityID']; ?>">
+                            <div class="card-header" id="heading<?php echo $row['DonationID']; ?>">
                                 <h5 class="mb-0">
-                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse<?php echo $row['ActivityID']; ?>" aria-expanded="true" aria-controls="collapse<?php echo $row['ActivityID']; ?>">
-                                        <?php echo $row['Activityname']; ?>
+                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse<?php echo $row['DonationID']; ?>" aria-expanded="true" aria-controls="collapse<?php echo $row['DonationID']; ?>">
+                                        <?php echo $row['DonationName']; ?>
                                     </button>
                                 </h5>
                             </div>
 
-                            <div id="collapse<?php echo $row['ActivityID']; ?>" class="collapse" aria-labelledby="heading<?php echo $row['ActivityID']; ?>" data-parent="#accordion">
+                            <div id="collapse<?php echo $row['DonationID']; ?>" class="collapse" aria-labelledby="heading<?php echo $row['DonationID']; ?>" data-parent="#accordion">
                                 <div class="card-body">
                                     <table class="table">
                                         <thead class="thead-dark">
@@ -70,16 +71,17 @@ if (!$result) {
                                                 <th scope="col">Name</th>
                                                 <th scope="col">Contact</th>
                                                 <th scope="col">Email</th>
+                                                <th scope="col">Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            // Make the query to retrieve user details who have joined this activity
+                                            // Make the query to retrieve user details who have joined this donation
                                             $userQuery = "
-                                                SELECT u.UserID, u.UserFirstName, u.UserLastName, u.UserEmail, u.UserContactDetails
+                                                SELECT u.UserID, u.UserFirstName, u.UserLastName, u.UserEmail, u.UserContactDetails, dj.DonationTotal
                                                 FROM user u
-                                                INNER JOIN activitiesJoined aj ON u.UserID = aj.UserID
-                                                WHERE aj.ActivityID = {$row['ActivityID']}
+                                                INNER JOIN donationjoined dj ON u.UserID = dj.UserID
+                                                WHERE dj.DonationID = {$row['DonationID']}
                                             ";
                                             $userResult = mysqli_query($dbc, $userQuery); // Run the query
 
@@ -97,6 +99,7 @@ if (!$result) {
                                                     <td><?php echo $userRow['UserFirstName'] . ' ' . $userRow['UserLastName']; ?></td>
                                                     <td><?php echo $userRow['UserContactDetails']; ?></td>
                                                     <td><?php echo $userRow['UserEmail']; ?></td>
+                                                    <td><?php echo $userRow['DonationTotal']; ?></td>
                                                 </tr>
                                             <?php endwhile; ?>
                                         </tbody>

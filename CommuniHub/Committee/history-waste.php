@@ -33,14 +33,18 @@ $resultHistory = @mysqli_query($dbc, $queryHistory);
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
+                            <th scope="col">No</th>
                             <th scope="col">Day</th>
                             <th scope="col">Time Updated</th>
                             <th scope="col">Date Updated</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($historyRow = mysqli_fetch_assoc($resultHistory)) : ?>
+                        <?php
+                        $counter=1;
+                        while ($historyRow = mysqli_fetch_assoc($resultHistory)) : ?>
                             <tr>
+                                <td><?php echo $counter++ ?></td>
                                 <td><?php echo $historyRow['GarbageDay']; ?></td>
                                 <td><?php echo $historyRow['Time']; ?></td>
                                 <td><?php echo $historyRow['DateUpdated']; ?></td>

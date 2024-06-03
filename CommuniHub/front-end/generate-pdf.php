@@ -1,6 +1,15 @@
 <?php
 require('../fpdf/fpdf.php');
 
+if (isset($_SESSION["UserID"])) {
+    $UserID = $_SESSION["UserID"];
+} elseif (isset($_GET['UserID'])) {
+    $UserID = $_GET['UserID'];
+    $_SESSION["UserID"] = $UserID; // Set UserID in session if not already set
+} else {
+    die('UserID is required');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once('../Database/database.php');
 
@@ -62,7 +71,6 @@ $pdf->Cell(0, 10, "Donor's Details", 0, 1);
 
 $pdf->SetFont('Arial', '', 10);
 $pdf->Cell(0, 10, "Name: 'UserFirstName 'UserLastName", 0, 1);
-$pdf->Cell(34, 5, 'Address', 0, 1);
 $pdf->Cell(0, 10, "Date: " . date("Y-m-d"), 0, 1);
 
 $pdf->Ln(10);
@@ -79,11 +87,7 @@ $pdf->Cell(64, 10, date("Y-m-d"), 1, 1);
 
 $pdf->Ln(10);
 
-$pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(0, 10, 'Message', 1, 1, 'C');
 
-$pdf->SetFont('Arial', '', 10);
-$pdf->Cell(0, 10, 'DonationMessage', 1, 1);
 
 $pdf->Ln(10);
 

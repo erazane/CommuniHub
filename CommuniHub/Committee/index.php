@@ -2,7 +2,7 @@
     session_start();
     include('include/header.php'); 
     ?>
-    </div>
+   
     <?php
 
     require_once('../Database/database.php');
@@ -50,6 +50,34 @@
     }
     ?>
 
+    <!-- slider section -->
+    <section class="slider_section ">
+      <div class="container ">
+        <div class="row">
+          <div class="col-md-6 ">
+          <div class="detail-box">
+              <h1>
+                One Step Solution To<br>
+                Suburban 
+                Management
+              </h1>
+              <h3>
+                A better community will create better lives.
+          </h3>
+              
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="img-box">
+              <img src="images/communityCircle.png" alt="">
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- end slider section -->
+    </div>
   <section class="service_section layout_padding">
     <div class="container">
         <div class="heading_container heading_center">

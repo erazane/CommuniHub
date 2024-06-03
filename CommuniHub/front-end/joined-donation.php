@@ -55,18 +55,21 @@ if(isset($_GET["UserID"]) && isset($_GET["DonationID"])) {
 } else {
     echo "UserID and DonationID are not set.";
 }
+
+
+
 ?>
 
     <!-- end php -->
 
-    <section class="service_section layout_padding">
-    <div class="container" style="max-width: 1200px; padding: 2%;">
+    <section class="service_section layout_padding wider_section">
+    <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
             <h2>Payment Details</h2>
         </div>
         <div class="row">
             <!-- Left card section for user details -->
-            <div class="col-md-8">
+            <div class="col-md-8 d-flex justify-content-center">
                 <div class="card">
                     <div class="text-center">
                         <h4 class="card-header"><?php echo isset($DonationName) ? $DonationName : ''; ?></h4>
@@ -94,60 +97,32 @@ if(isset($_GET["UserID"]) && isset($_GET["DonationID"])) {
                         <form id="donationForm" action="payment.php" method="POST" enctype="multipart/form-data">
                             <h4><strong>Summary</strong></h4>
                             <hr>
-                            <div class="form-group">
-                                <label for="UserFirstName">First Name:</label>
-                                <input type="text" class="form-control" id="UserFirstName" name="UserFirstName" value="<?php echo $UserFirstName; ?>" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="UserLastName">Last Name:</label>
-                                <input type="text" class="form-control" id="UserLastName" name="UserLastName" value="<?php echo $UserLastName; ?>" required>
-                            </div>
+                            <h5>Name: <?php echo $UserFirstName . ' ' . $UserLastName; ?></h5>
                             <hr>
-                            <div class="form-group">
-                                <label for="CardHolder">Card Holder:</label>
-                                <input type="text" class="form-control" id="CardHolder" name="CardHolder" value="<?php echo $CardHolder; ?>" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cardType">Card Type:</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="cardType" name="cardType" value="<?php echo $cardType; ?>" required>
+                            <h4><strong>Payment Details</strong></h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Card Holder:</strong> <?php echo $CardHolder; ?></p>
+                                    <p><strong>Card Type:</strong> <?php echo $cardType; ?></p>
+                                    <p><strong>Donation Amount:</strong> <?php echo $DonationTotal; ?></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Donate On:</strong> <?php echo $DateJoined; ?></p>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="DonationTotal">Donation Amount:</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">RM</span>
-                                    </div>
-                                    <input type="text" class="form-control" id="DonationTotal" name="DonationTotal"  value="<?php echo $DonationTotal; ?>" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="DonationMessage">Message:</label>
-                                <input type="text" class="form-control" id="DonationMessage" name="DonationMessage" value="<?php echo $DonationMessage; ?>" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="DateJoined">Donate On:</label>
-                                <input type="text" class="form-control" id="DateJoined" name="DateJoined" value="<?php echo $DateJoined; ?>" required>
-                            </div>
-
-                            <input type="hidden" name="DonationID" value="<?php echo $DonationID; ?>">
-                            <input type="hidden" name="UserID" value="<?php echo $UserID; ?>">
                             <hr>
                             <div class="text-right">
                                 <a href="donations.php" class="btn btn-primary btn-lg mt-3">Back</a>
-                                <a href="generate-pdf.php" class="btn btn-primary btn-lg  mt-3">Generate PDF</a> 
+                                <a href="generate-pdf.php?UserID=<?php echo $UserID;?>" class="btn btn-primary btn-lg  mt-3">Generate PDF</a> 
                             </div>
-
-                            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                         </form>
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 </div>
+
 
 <?php include('include/footer.php');?>

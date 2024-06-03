@@ -1,3 +1,4 @@
+y code
 <?php
 session_start();
 include('include/header.php');
@@ -11,14 +12,15 @@ $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
 
 // Initial query
-$query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDate, c.ComplaintType, c.UserID, c.image 
+$query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDate, c.ComplaintType, c.UserID, c.image, 
+                 r.respondDate, r.respondTitle, r.respondDesc
           FROM complaint c 
           JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID
           WHERE r.status = 'Completed'";
 
 // Add filter for type of discussion
 if ($filterType) {
-    $query .= " WHERE ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
+    $query .= " AND ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
 }
 
 // Add order by clause
@@ -92,6 +94,7 @@ if (!$result) {
                             <th scope="col">Type</th>
                             <th scope="col">Date</th>
                             <th scope="col">Image</th>
+                            <th scope="col">Response</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,7 +102,7 @@ if (!$result) {
                         $counter=1;
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr>
-                                <td><?php echo $counter++ ?>;</td>
+                                <td><?php echo $counter++ ?></td>
                                 <td><?php echo $row['ComplainTitle']; ?></td>
                                 <td style="text-align: justify;"><?php echo $row['ComplaintDesc']; ?></td>
                                 <td><?php echo $row['ComplaintType']; ?></td>
@@ -113,7 +116,9 @@ if (!$result) {
                                         No Image
                                     <?php endif; ?>
                                 </td>
-                                
+                                <td>
+                                    <button type="button" class="btn btn-primary mr-2" data-toggle="modal" data-target="#responseModal<?php echo $row['ComplaintID']; ?>">Response</button>
+                                </td>
                             </tr>
 
                             <!-- Modal -->
@@ -129,6 +134,37 @@ if (!$result) {
                                         <div class="modal-body">
                                             <div class="profile_picture_container text-center mb-4" style="padding: 10%;">
                                                 <img class="img-fluid" src="../front-end/images/complaint/<?php echo $row['image'] ? $row['image'] : "nodata.jpg"; ?>" alt="<?php echo $row['ComplainTitle']; ?>">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Response Modal -->
+                            <div class="modal fade" id="responseModal<?php echo $row['ComplaintID']; ?>" tabindex="-1" role="dialog" aria-labelledby="responseModalLabel<?php echo $row['ComplaintID']; ?>" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="responseModalLabel<?php echo $row['ComplaintID']; ?>">Response to: <?php echo $row['ComplainTitle']; ?></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label for="responseDate<?php echo $row['ComplaintID']; ?>">Response Date:</label>
+                                                <p id="responseDate<?php echo $row['ComplaintID']; ?>"><?php echo $row['respondDate']; ?></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="responseTitle<?php echo $row['ComplaintID']; ?>">Response Title:</label>
+                                                <p id="responseTitle<?php echo $row['ComplaintID']; ?>"><?php echo $row['respondTitle']; ?></p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="responseDesc<?php echo $row['ComplaintID']; ?>">Response Description:</label>
+                                                <p id="responseDesc<?php echo $row['ComplaintID']; ?>"><?php echo $row['respondDesc']; ?></p>
                                             </div>
                                         </div>
                                         <div class="modal-footer">

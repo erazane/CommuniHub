@@ -25,7 +25,7 @@ $result = mysqli_query($dbc, $query); // Run the query
                 <div class="pillbox border">
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link " href="manage-donations.php">Current Schedule</a>
+                            <a class="nav-link " href="manage-donation.php">Current Donation</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="donation-joined.php">Donations Joined</a>
@@ -43,6 +43,7 @@ $result = mysqli_query($dbc, $query); // Run the query
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
+                            <th scope="col">No</th>
                             <th scope="col">Title</th>
                             <th scope="col">Description</th>
                             <th scope="col">Target</th>
@@ -50,12 +51,15 @@ $result = mysqli_query($dbc, $query); // Run the query
                             <th scope="col">Start Date</th>
                             <th scope="col">End Date</th>
                             <th scope="col">Status</th>
-                            <th scope="col">Action</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                        <?php
+                        $counter=1;
+                        while ($row = mysqli_fetch_assoc($result)) : ?>
                         <tr>
+                            <td><?php echo $counter++ ?></td>
                             <td><?php echo $row['DonationName']; ?></td>
                             <td style="text-align: justify;"><?php echo $row['DonationDesc']; ?></td>
                             <td><?php echo $row['DonationTarget']; ?></td>
@@ -64,13 +68,7 @@ $result = mysqli_query($dbc, $query); // Run the query
                             <td><?php echo $row['DonationEndDate']; ?></td>
                             <td><?php echo $row['DonationStatus']; ?></td>
                             
-                            <td>
-                                <div class="btn-group" style="padding: 5;">
-                                    <br><br>
-                                    <button type="button" class="btn btn-warning" onclick="deleteDonation(<?php echo $row['DonationID']; ?>)">Delete </button>
-                                    <button type="button" class="btn btn-secondary" onclick="UpdateDonation(<?php echo $row['DonationID']; ?>)">Update </button>
-                                </div>
-                            </td>
+                            
                         </tr>
                         <?php endwhile; ?>
                     </tbody>

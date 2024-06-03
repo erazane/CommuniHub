@@ -31,7 +31,7 @@ if (!$result) {
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
-            <h2>Activity History</h2>
+            <h2>Complaint History</h2>
             <hr>
         </div>
         <div class="row justify-content-between align-items-center mt-3">

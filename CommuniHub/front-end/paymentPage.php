@@ -117,6 +117,25 @@ if ($result) {
 } else {
     echo "Error: " . mysqli_error($dbc);
 }
+
+    // Calculate the total donations collected for this donation
+    $query_total_collected = "SELECT SUM(DonationTotal) AS total_collected FROM donationjoined WHERE DonationID = $DonationID";
+    $result_total_collected = mysqli_query($dbc, $query_total_collected);
+
+    if($result_total_collected && mysqli_num_rows($result_total_collected) > 0) {
+        $row_total_collected = mysqli_fetch_assoc($result_total_collected);
+        $DonationCollectionAmount = $row_total_collected['total_collected'];
+    } else {
+        $DonationCollectionAmount = 0;
+    }
+
+    // Calculate the progress percentage for this donation
+    if ($DonationTarget > 0) {
+        $progress = ($DonationCollectionAmount / $DonationTarget) * 100;
+    } else {
+        $progress = 0;
+    }
+
 ?>
 
 <section class="service_section layout_padding wider_section">
@@ -140,6 +159,10 @@ if ($result) {
                                 <div class="form-group">
                                     <label for="DonationTotal">Donation Amount:</label>
                                     <div class="input-group">
+                                    <div class="input-group-prepend">
+
+                                        <span class="input-group-text"><strong>RM</strong></span>
+                                    </div>
                                         <input type="text" class="form-control" id="DonationTotal" name="DonationTotal" placeholder="Enter Amount">
                                     </div>
                                 </div>
@@ -233,7 +256,7 @@ if ($result) {
 
                             <hr>
                             <h3>QR Transfer</h3>
-                           <h5>If you prefer,you may also use QR transfer.If you do choose this method of payment,<br>then please upload the receipt aswell.</h5>
+                           <!-- <h5>If you prefer,you may also use QR transfer.If you do choose this method of payment,<br>then please upload the receipt aswell.</h5> -->
                            <!-- <form id="receipt" enctype="multipart/form-data">
                             <input type="file" name="ReceiptImages" id="image" accept=".jpg, .jpeg, .png" > -->
                             <br>
@@ -254,6 +277,8 @@ if ($result) {
                              </div>
                            </div>
                            <br>
+                           <p style="color: #ff6a19; font-size: 16px;" class="mt-2"><b>Note:</b> When you make a transfer, please send the evidence to scholarshipsheikh@gmail.com for confirmation. Thank you.</p>
+                           <br>
                            <!-- <div class="text-center">
                                 <button type="button" onclick="addReceipt();" class="btn btn-primary btn-lg">Confirm</button>
                             </div> -->
@@ -267,15 +292,22 @@ if ($result) {
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Current Donation</h4>
+                        <hr>
                         <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h5 class="card-title"><?php echo htmlspecialchars($DonationName); ?></h5>
+                            <div class="col-md-10">
+                                <h5 class="card-title">Title : <?php echo htmlspecialchars($DonationName); ?></h5>
                             </div>
                             <img class="img-fluid img-thumbnail" src="../Committee/images/donations/<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($DonationName); ?>">
                         </div>
-                        <p class="card-text">Target: <?php echo htmlspecialchars($DonationTarget); ?></p>
+                        <br>
+                        <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-text">Target: RM <?php echo htmlspecialchars($DonationTarget); ?></h5>
+                        <h5 class="card-text">Current :RM <?php echo htmlspecialchars($DonationCollectionAmount); ?></h5>
+                        </div>
+                        
                         <div class="progress mt-3" style="height: 20px;">
-                            <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar" role="progressbar" style="width: <?php echo $progress; ?>%;" aria-valuenow="<?php echo $progress; ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                            <!-- <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div> -->
                         </div>
                     </div>
                 </div>
@@ -286,19 +318,50 @@ if ($result) {
                         <ul class="list-group">
                             <?php
                             // Fetch the first three donations from the database
-                            $query = "SELECT DonationID, DonationName FROM donation LIMIT 3";
+                            $query = "SELECT DonationID, DonationName,DonationStatus, DonationTarget, status FROM donation WHERE status = 'Ongoing' LIMIT 3";
                             $result = mysqli_query($dbc, $query);
-
+                
                             if ($result) {
                                 while ($row = mysqli_fetch_assoc($result)) {
+                                    $DonationID = $row['DonationID'];
+                                    $DonationName = htmlspecialchars($row['DonationName']);
+                                    $DonationTarget = $row['DonationTarget'];
+                                    $DonationStatus = htmlspecialchars($row['DonationStatus']); // Ensure DonationStatus is set
+                                
+                                    // Fetch the total collected amount for this donation
+                                    $query_total_collected = "SELECT SUM(DonationTotal) AS total_collected FROM donationjoined WHERE DonationID = $DonationID";
+                                    $result_total_collected = mysqli_query($dbc, $query_total_collected);
+                                
+                                    if ($result_total_collected && mysqli_num_rows($result_total_collected) > 0) {
+                                        $row_total_collected = mysqli_fetch_assoc($result_total_collected);
+                                        $DonationCollectionAmount = $row_total_collected['total_collected'];
+                                    } else {
+                                        $DonationCollectionAmount = 0;
+                                    }
+                                
+                                    // Calculate the progress percentage for this donation
+                                    if ($DonationTarget > 0) {
+                                        $progress = ($DonationCollectionAmount / $DonationTarget) * 100;
+                                    } else {
+                                        $progress = 0;
+                                    }
                                     ?>
                                     <li class="list-group-item">
-                                        <span><?php echo htmlspecialchars($row['DonationName']); ?></span>
+                                        <!-- <span><?php echo $DonationName; ?></span> -->
+                                        <div class="d-flex justify-content-between align-items-center">
+                                        <span><?php echo $DonationName; ?></span>
+                                        </div>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="progress" style="width: 60%;">
-                                                <div class="progress-bar" role="progressbar" style="width: <?php echo rand(10, 90); ?>%;" aria-valuenow="<?php echo rand(10, 90); ?>" aria-valuemin="0" aria-valuemax="100"></div>
+                                                <div class="progress-bar" role="progressbar" style="width: <?php echo $progress; ?>%;" aria-valuenow="<?php echo $progress; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                                             </div>
-                                            <a href="payment.php?DonationID=<?php echo $row['DonationID']; ?>&UserID=<?php echo $UserID; ?>" class="btn btn-primary btn-sm">Donate</a>
+                                            <div class="col-md-3 text-center" style="width:80px;background-color: #ffc107;border-radius: 2px;box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);">
+                                            <span><?php echo $DonationStatus; ?></span>
+                                            </div>
+                                            
+                                            <!-- <div class="badge bg-warning text-dark" style="width: 80px;height:20px; text-align: center; "><?php echo $DonationStatus; ?></div> -->
+                                            <!-- <button type="button" class="btn btn-warning" disabled><?php echo $DonationStatus; ?></button> -->
+                                            <!-- <a href="payment.php?DonationID=<?php echo $DonationID; ?>&UserID=<?php echo $UserID; ?>" class="btn btn-primary btn-sm">Donate</a> -->
                                         </div>
                                     </li>
                                     <?php
@@ -313,6 +376,7 @@ if ($result) {
                         </div>
                     </div>
                 </div>
+
             </div>
             
         </div>

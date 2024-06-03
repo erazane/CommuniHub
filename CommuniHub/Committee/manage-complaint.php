@@ -102,7 +102,7 @@ if (!$result) {
                         $counter=1;
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr>
-                                <td><?php echo $counter++ ?>;</td>
+                                <td><?php echo $counter++ ?></td>
                                 <td><?php echo $row['ComplainTitle']; ?></td>
                                 <td style="text-align: justify;"><?php echo $row['ComplaintDesc']; ?></td>
                                 <td><?php echo $row['ComplaintType']; ?></td>

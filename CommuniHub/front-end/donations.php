@@ -68,6 +68,24 @@ if (!$result) {
                 $DonationStatus = $row['DonationStatus'];
                 $image = $row['image'];
 
+                // Calculate the total donations collected for this donation
+                $query_total_collected = "SELECT SUM(DonationTotal) AS total_collected FROM donationjoined WHERE DonationID = $DonationID";
+                $result_total_collected = mysqli_query($dbc, $query_total_collected);
+
+                if($result_total_collected && mysqli_num_rows($result_total_collected) > 0) {
+                    $row_total_collected = mysqli_fetch_assoc($result_total_collected);
+                    $DonationCollectionAmount = $row_total_collected['total_collected'];
+                } else {
+                    $DonationCollectionAmount = 0;
+                }
+
+                // Calculate the progress percentage for this donation
+                if ($DonationTarget > 0) {
+                    $progress = ($DonationCollectionAmount / $DonationTarget) * 100;
+                } else {
+                    $progress = 0;
+                }
+
                 // Open a new row after every third card
                 if ($count % 3 == 0) {
                     echo '<div class="row">';
@@ -82,12 +100,15 @@ if (!$result) {
                     </div>
                     <div class="card-footer">
                         <div class="d-flex justify-content-between">
-                            <strong><p>Target: <?php echo htmlspecialchars($DonationTarget); ?></p></strong>
+                            <strong><p>Target:RM  <?php echo htmlspecialchars($DonationTarget); ?></p></strong>
                             <strong><p>Status: <?php echo htmlspecialchars($DonationStatus); ?></p></strong>
+                        </div>
+                        <div class="text-left">
+                            <strong><p>Currently Donated: RM <span><?php echo htmlspecialchars($DonationCollectionAmount); ?></p></strong>
                         </div>
                         <br>
                         <div class="progress" style="height: 20px;">
-                            <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar" role="progressbar" style="width: <?php echo $progress; ?>%;" aria-valuenow="<?php echo $progress; ?>" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <br>
                         <a href="#" class="btn btn-primary btn-block md-2" onclick="confirmJoin(<?php echo $row['DonationID']; ?>, '<?php echo htmlspecialchars($UserID); ?>');">Join</a>

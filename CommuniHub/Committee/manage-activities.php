@@ -57,6 +57,7 @@ if (!$result) {
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
+                            <th scope="col">No</th>
                             <th scope="col">Title</th>
                             <th scope="col">Location</th>
                             <th scope="col">Date</th>
@@ -68,8 +69,11 @@ if (!$result) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
-                        <tr>
+                    <?php
+                        $counter=1;
+                         while ($row = mysqli_fetch_assoc($result)) : ?>
+                            <tr>
+                            <td><?php echo $counter++ ?></td>
                             <td><?php echo $row['Activityname']; ?></td>
                             <td style="text-align: justify;"><?php echo $row['ActivityLocation']; ?></td>
                             <td><?php echo $row['ActivityDate']; ?></td>
@@ -80,8 +84,8 @@ if (!$result) {
                             <td>
                                 <div class="btn-group" style="padding: 5;">
                                     <br><br>
-                                    <button type="button" class="btn btn-warning" onclick="deleteActivity(<?php echo $row['ActivityID']; ?>)">Delete </button>
-                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#UpdateActivity" data-activityid="<?php echo $row['ActivityID']; ?>">Update</button>
+                                    <button type="button" class="btn btn-warning" onclick="deleteActivity(<?php echo $row['ActivityID']; ?>)"><i class="fa fa-trash" aria-hidden="true"></i> </button>
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#UpdateActivity" data-activityid="<?php echo $row['ActivityID']; ?>"><i class="fa fa-pencil" aria-hidden="true"></i></button>
 
                                     <!-- <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#UpdateActivity">Update</button> -->
                                     <!-- Modal -->

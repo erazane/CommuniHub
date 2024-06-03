@@ -130,8 +130,8 @@ if ($result && mysqli_num_rows($result) == 1) {
           <div class="card-body">
             <div class="heading_container heading_center">
               <h2 class="text-center mb-4">User Profile</h2>
-              <hr style="width: 350px; text-align: center">
-                
+                <hr style="width: 350px; text-align: center">
+              
             </div>
 
             <!-- Display uploaded profile picture -->
