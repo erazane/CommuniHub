@@ -73,9 +73,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <li class="nav-item">
                             <a class="nav-link active" href="add-admin.php">Add Administrator</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">History</a>
-                        </li>
                     </ul>
                 </div>
             </div>

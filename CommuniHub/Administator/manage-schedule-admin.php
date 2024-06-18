@@ -1,6 +1,39 @@
 <?php
 session_start();
 include('include/header.php');
+
+$counter = 1;
+// Fetch data for garbage schedule
+$query = "SELECT GarbageDay, Time, DateUpdated FROM schedule ORDER BY ScheduleID DESC LIMIT 1";
+$garbageResult = mysqli_query($dbc, $query);
+
+if (!$garbageResult) {
+    die('Query failed: ' . mysqli_error($dbc));
+}
+
+// Fetch data for glass schedule
+$query = "SELECT GlassPickupday, Time, DateUpdated FROM glassSchedule ORDER BY glassScheduleID DESC LIMIT 1";
+$glassResult = mysqli_query($dbc, $query);
+
+if (!$glassResult) {
+    die('Query failed: ' . mysqli_error($dbc));
+}
+
+// Fetch data for paper schedule
+$query = "SELECT PaperPickupDay, Time, DateUpdated FROM paperSchedule ORDER BY paperScheduleID DESC LIMIT 1";
+$paperResult = mysqli_query($dbc, $query);
+
+if (!$paperResult) {
+    die('Query failed: ' . mysqli_error($dbc));
+}
+
+// Fetch data for plastic schedule
+$query = "SELECT PlasticPickupDay, Time, DateUpdated FROM plasticSchedule ORDER BY plasticScheduleID DESC LIMIT 1";
+$plasticResult = mysqli_query($dbc, $query);
+
+if (!$plasticResult) {
+    die('Query failed: ' . mysqli_error($dbc));
+}
 ?>
 </div>
 <!-- end header section -->
@@ -8,7 +41,7 @@ include('include/header.php');
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
-            <h2>User Dashboard</h2>
+            <h2>Schedule Dashboard</h2>
             <hr>
         </div>
         <div class="row">
@@ -30,10 +63,6 @@ include('include/header.php');
                         <li class="nav-item">
                             <a class="nav-link" href="glass.php">Glass</a>
                         </li>
-            
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">History</a>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -41,22 +70,17 @@ include('include/header.php');
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">First Name</th>
-                            <th scope="col">Last Name</th>
-                            <th scope="col">Username</th>
-                            <th scope="col">Age</th>
-                            <th scope="col">Martial Status</th>
-                            <th scope="col">Occupation</th>
-                            <th scope="col">Contact Details</th>
-                            <th scope="col">Type</th>               
+                            <th scope="col">Type</th>
+                            <th scope="col">Day</th>
+                            <th scope="col">Time</th>
+                            <th scope="col">Last Updated</th>            
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                         <tr>
-                            <!-- <td><?php echo $row['UserID']; ?></td>
+                            <td><?php echo $counter++; ?></td> 
                             <td><?php echo $row['UserFirstName']; ?></td>
                             <td><?php echo $row['UserLastName']; ?></td>
                             <td><?php echo $row['UserUserName']; ?></td>
@@ -64,7 +88,7 @@ include('include/header.php');
                             <td><?php echo $row['UserMartialStatus']; ?></td>
                             <td><?php echo $row['UserOccupation']; ?></td>
                             <td><?php echo $row['UserContactDetails']; ?></td>
-                            <td><?php echo ($row['CommiteeID']) ? "Committee" : "Resident"; ?></td> -->
+                            <td><?php echo ($row['CommiteeID']) ? "Committee" : "Resident"; ?></td> 
                             <td>
                                 <div class="btn-group" style="padding: 5;">
                                     <br><br>

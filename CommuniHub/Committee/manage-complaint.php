@@ -9,6 +9,10 @@ require_once('../Database/database.php');
 $filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
 $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
+// Set pagination parameters
+$recordsPerPage = 10; // Number of records per page
+$currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Current page number
+$offset = ($currentPage - 1) * $recordsPerPage; // Offset for the query
 
 // Initial query
 $query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDate, c.ComplaintType, c.UserID, c.image 
@@ -18,19 +22,28 @@ $query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDat
 
 // Add filter for type of discussion
 if ($filterType) {
-    $query .= " WHERE ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
+    $query .= " AND ComplaintType = '" . mysqli_real_escape_string($dbc, $filterType) . "'";
 }
-
-$result = mysqli_query($dbc, $query); // Run the query
 
 // Add order by clause
 $query .= " ORDER BY c.ComplaintDate " . $filterOrder;
+
+// Count total records for pagination
+$countQuery = "SELECT COUNT(*) AS total FROM ($query) AS total";
+$countResult = mysqli_query($dbc, $countQuery);
+$totalRecords = mysqli_fetch_assoc($countResult)['total'];
+
+// Modify query to add pagination
+$query .= " LIMIT $offset, $recordsPerPage";
 
 $result = mysqli_query($dbc, $query); // Run the query
 
 if (!$result) {
     die('Query failed: ' . mysqli_error($dbc));
 }
+
+// Calculate total pages
+$totalPages = ceil($totalRecords / $recordsPerPage);
 ?>
 
 <section class="service_section layout_padding wider_section">
@@ -55,7 +68,7 @@ if (!$result) {
                 </div>
                 <br>
                 <br>
-               <!-- filter -->
+                <!-- filter -->
                 <form class="form-inline justify-content-end" method="GET" action="">
                     <div class="form-row align-items-center">
                         <div class="col-auto mb-2">
@@ -82,7 +95,6 @@ if (!$result) {
                     </div>
                 </form>
                 <!-- end filter -->
-
             </div>
             <div class="col-lg-9">
                 <table class="table">
@@ -99,7 +111,7 @@ if (!$result) {
                     </thead>
                     <tbody>
                         <?php
-                        $counter=1;
+                        $counter = $offset + 1; // Adjust counter to reflect pagination
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr>
                                 <td><?php echo $counter++ ?></td>
@@ -119,7 +131,6 @@ if (!$result) {
                                 <td>
                                     <div class="btn-group" style="padding: 5;">
                                         <a href="resolve-complaint.php?ComplaintID=<?php echo $row['ComplaintID']; ?>" class="btn btn-primary">Resolve</a>
-                                        <!-- <a href="resolve-complaint.php" class="btn btn-primary" onclick="resolveComplaint(<?php echo $row['ComplaintID']; ?>)">Resolve</a> -->
                                     </div>
                                 </td>
                             </tr>
@@ -148,6 +159,34 @@ if (!$result) {
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+<hr>
+                <!-- Pagination -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <?php if ($currentPage > 1) : ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?php echo $currentPage - 1; ?>&filterType=<?php echo $filterType; ?>&filterOrder=<?php echo $filterOrder; ?>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        <?php for ($page = 1; $page <= $totalPages; $page++) : ?>
+                            <li class="page-item <?php if ($page == $currentPage) echo 'active'; ?>">
+                                <a class="page-link" href="?page=<?php echo $page; ?>&filterType=<?php echo $filterType; ?>&filterOrder=<?php echo $filterOrder; ?>"><?php echo $page; ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        <?php if ($currentPage < $totalPages) : ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?php echo $currentPage + 1; ?>&filterType=<?php echo $filterType; ?>&filterOrder=<?php echo $filterOrder; ?>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
+                <!-- End Pagination -->
             </div>
         </div>
     </div>

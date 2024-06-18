@@ -81,7 +81,7 @@ if (isset($_POST['Submit'])) {
                     <div class="col-md-6">
                         <div class="login-title">
                             <h2>Login</h2>
-                            <p>Dont have an account? <a href="#" class="link-primary">Create your account here !</a></p>
+                            <!-- <p>Dont have an account? <a href="#" class="link-primary">Create your account here !</a></p> -->
                         </div>
                         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 

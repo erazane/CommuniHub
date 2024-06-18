@@ -10,8 +10,11 @@ include('include/header.php');
 require_once('../Database/database.php');
 
 // Make the query
-$query = "SELECT adminID, adminName, adminUserName, adminPwd FROM admin ORDER BY adminID ASC";
+$query = "SELECT adminID, adminName, adminUserName FROM admin ORDER BY adminID ASC";
 $result = mysqli_query($dbc, $query); // Run the query
+
+// Initialize the counter
+$counter = 1;
 ?>
 
 <section class="service_section layout_padding wider_section">
@@ -30,9 +33,6 @@ $result = mysqli_query($dbc, $query); // Run the query
                         <li class="nav-item">
                             <a class="nav-link" href="add-admin.php">Add Administrator</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">History</a>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -40,26 +40,25 @@ $result = mysqli_query($dbc, $query); // Run the query
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">No</th>
                             <th scope="col">Name</th>
                             <th scope="col">Username</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                    <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                         <tr>
-                            <td><?php echo $row['adminID']; ?></td>
+                            <td><?php echo $counter++; ?></td> <!-- Increment counter properly -->
                             <td><?php echo $row['adminName']; ?></td>
                             <td><?php echo $row['adminUserName']; ?></td>
                             <td>
                                 <div class="btn-group" style="padding: 5;">
-                                    <br><br>
-                                    <button type="button" class="btn btn-secondary" onclick="deleteAdmin(<?php echo $row['adminID']; ?>)">Delete Admin</button>
+                                    <button type="button" class="btn btn-warning" onclick="deleteAdmin(<?php echo $row['adminID']; ?>)"><i class="fa fa-trash" aria-hidden="true"></i></button>
                                 </div>
                             </td>
                         </tr>
-                        <?php endwhile; ?>
+                    <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
@@ -68,7 +67,6 @@ $result = mysqli_query($dbc, $query); // Run the query
 </section>
 
 <?php include('include/footer.php'); ?>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
