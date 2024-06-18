@@ -120,7 +120,7 @@ if(isset($_SESSION['UserFirstName']) && isset($_SESSION['UserLastname'])) {
                   <a class="nav-link" href="manage-complaint.php">Complaints</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="UserProfile.php">User Profile</a>
+                  <a class="nav-link" href="manage-discussions.php">Discussions</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="Committee-logout.php">Logout</a>

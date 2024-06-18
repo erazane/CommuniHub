@@ -7,17 +7,32 @@ include('include/header.php');
 <?php
 require_once('../Database/database.php');
 
+// Fetch filter values
+$filterType = isset($_GET['filterType']) ? mysqli_real_escape_string($dbc, $_GET['filterType']) : '';
+$filterOrder = isset($_GET['filterOrder']) ? mysqli_real_escape_string($dbc, $_GET['filterOrder']) : 'DESC';
 
-// Make the query
+// Pagination settings
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10; // Number of records per page
+$offset = ($page - 1) * $limit;
+
+// Make the query with filters and pagination
 $query = "
-    SELECT a.ActivityID, a.Activityname, a.ActivityLocation , a.ActivityDate, a.ActivityTime, a.ActivityType, a.Status,
+    SELECT a.ActivityID, a.Activityname, a.ActivityLocation, a.ActivityDate, a.ActivityTime, a.ActivityType, a.Status,
            COUNT(aj.UserID) AS NumJoined
     FROM activities a
-    LEFT JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID WHERE a.Status = 'Ongoing'
-    GROUP BY a.ActivityID, a.Activityname, a.ActivityLocation , a.ActivityDate, a.ActivityTime, a.ActivityType ,a.Status
-";
+    LEFT JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID
+    WHERE a.Status = 'Ongoing'";
 
-$result = mysqli_query($dbc, $query); // Run the query
+if ($filterType) {
+    $query .= " AND a.ActivityType = '$filterType'";
+}
+
+$query .= " GROUP BY a.ActivityID, a.Activityname, a.ActivityLocation, a.ActivityDate, a.ActivityTime, a.ActivityType, a.Status";
+$query .= " ORDER BY a.ActivityDate $filterOrder, a.ActivityTime $filterOrder";
+$query .= " LIMIT $limit OFFSET $offset";
+
+$result = mysqli_query($dbc, $query);
 
 // Check if query was successful
 if (!$result) {
@@ -26,7 +41,21 @@ if (!$result) {
     exit();
 }
 
+// Count total records for pagination
+$countQuery = "
+    SELECT COUNT(*) AS total
+    FROM activities
+    WHERE Status = 'Ongoing'";
+
+if ($filterType) {
+    $countQuery .= " AND ActivityType = '$filterType'";
+}
+
+$countResult = mysqli_query($dbc, $countQuery);
+$totalRecords = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRecords / $limit);
 ?>
+
 
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
@@ -52,6 +81,36 @@ if (!$result) {
                         </li>
                     </ul>
                 </div>
+                <!-- Filter form -->
+                <form class="form-inline justify-content-end" method="GET" action="">
+                    <div class="form-row align-items-center">
+                        <div class="col-auto mb-2">
+                            <label for="filterType" class="mr-2">Type:</label>
+                            <select class="form-control" id="filterType" name="filterType">
+                                <option value="">All</option>
+                                <option value="Clean-up Day" <?= ($filterType == 'Clean-up Day') ? 'selected' : '' ?>>Clean-up Day</option>
+                                <option value="Block-Party" <?= ($filterType == 'Block-Party') ? 'selected' : '' ?>>Block-Party</option>
+                                <option value="Community-Garden" <?= ($filterType == 'Community-Garden') ? 'selected' : '' ?>>Community Garden</option>
+                                <option value="Fitness-Classes" <?= ($filterType == 'Fitness-Classes') ? 'selected' : '' ?>>Fitness-Classes</option>
+                                <option value="Holiday-Celebrations" <?= ($filterType == 'Holiday-Celebrations') ? 'selected' : '' ?>>Holiday Celebrations</option>
+                                <option value="Workshops" <?= ($filterType == 'Workshops') ? 'selected' : '' ?>>Workshops</option>
+                                <option value="Other" <?= ($filterType == 'Other') ? 'selected' : '' ?>>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-auto mb-2">
+                            <label for="filterOrder" class="mr-2">Order:</label>
+                            <select class="form-control" id="filterOrder" name="filterOrder">
+                                <option value="DESC" <?= ($filterOrder == 'DESC') ? 'selected' : '' ?>>Descending</option>
+                                <option value="ASC" <?= ($filterOrder == 'ASC') ? 'selected' : '' ?>>Ascending</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2 w-100">
+                            <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                        </div>
+                    </div>
+                </form>
+
             </div>
             <div class="col-lg-9">
                 <table class="table">
@@ -82,11 +141,11 @@ if (!$result) {
                             <td><?php echo $row['NumJoined']; ?></td>
                             <td><?php echo$row['Status'];?></td>
                             <td>
-                                <div class="btn-group" style="padding: 5;">
-                                    <br><br>
+                                     <div class="btn-group">
                                     <button type="button" class="btn btn-warning" onclick="deleteActivity(<?php echo $row['ActivityID']; ?>)"><i class="fa fa-trash" aria-hidden="true"></i> </button>
-                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#UpdateActivity" data-activityid="<?php echo $row['ActivityID']; ?>"><i class="fa fa-pencil" aria-hidden="true"></i></button>
 
+                                    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#UpdateActivity" data-activityid="<?php echo $row['ActivityID']; ?>"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                     </div>
                                     <!-- <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#UpdateActivity">Update</button> -->
                                     <!-- Modal -->
                                     <div class="modal fade" id="UpdateActivity" tabindex="-1" role="dialog" aria-labelledby="UpdateActivityTitle" aria-hidden="true">
@@ -204,7 +263,28 @@ if (!$result) {
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                <hr>
+                <!-- Pagination -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <?php if ($page > 1): ?>
+                            <li class="page-item"><a class="page-link" href="?page=<?= $page - 1 ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>">Previous</a></li>
+                        <?php endif; ?>
+                        
+                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>"><?= $i ?></a>
+                            </li>
+                        <?php endfor; ?>
+                        
+                        <?php if ($page < $totalPages): ?>
+                            <li class="page-item"><a class="page-link" href="?page=<?= $page + 1 ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>">Next</a></li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
+
             </div>
+            
         </div>
     </div>
 </section>

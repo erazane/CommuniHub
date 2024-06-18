@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <section class="service_section layout_padding">
     <div class="container">
     <div class="heading_container heading_center">
-            <h2>Recyclable : Paper </h2>
+            <h2>RECYCLABLE : PAPER</h2>
             <hr>
             <div class="btn-group" role="group" aria-label="Basic example">
                 <a href="schedule-paper.php" class="btn btn-primary active">Current</a>

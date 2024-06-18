@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <section class="service_section layout_padding">
     <div class="container">
     <div class="heading_container heading_center">
-            <h2>General Waste </h2>
+            <h2>GENERAL WASTE </h2>
             <hr>
             <div class="btn-group" role="group" aria-label="Basic example">
                 <a href="schedule-waste.php" class="btn btn-primary active">Current</a>

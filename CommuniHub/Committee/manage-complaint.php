@@ -118,7 +118,6 @@ if (!$result) {
                                 </td>
                                 <td>
                                     <div class="btn-group" style="padding: 5;">
-                                        <br><br>
                                         <a href="resolve-complaint.php?ComplaintID=<?php echo $row['ComplaintID']; ?>" class="btn btn-primary">Resolve</a>
                                         <!-- <a href="resolve-complaint.php" class="btn btn-primary" onclick="resolveComplaint(<?php echo $row['ComplaintID']; ?>)">Resolve</a> -->
                                     </div>
