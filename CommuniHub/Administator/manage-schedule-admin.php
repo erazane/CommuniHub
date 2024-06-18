@@ -1,38 +1,47 @@
 <?php
 session_start();
 include('include/header.php');
+require_once('../Database/database.php');
 
-$counter = 1;
-// Fetch data for garbage schedule
-$query = "SELECT GarbageDay, Time, DateUpdated FROM schedule ORDER BY ScheduleID DESC LIMIT 1";
+$counter = 1; // Initialize counter
+
+// Fetch the latest schedules for different types of waste
+$schedules = [];
+
+// General waste schedule
+$query = "SELECT 'General Waste' as Type, GarbageDay as Day, Time, DateUpdated FROM schedule ORDER BY ScheduleID DESC LIMIT 1";
 $garbageResult = mysqli_query($dbc, $query);
-
-if (!$garbageResult) {
-    die('Query failed: ' . mysqli_error($dbc));
+if ($garbageResult && mysqli_num_rows($garbageResult) > 0) {
+    $schedules[] = mysqli_fetch_assoc($garbageResult);
+} else {
+    $schedules[] = ['Type' => 'General Waste', 'Day' => '-', 'Time' => '-', 'DateUpdated' => '-'];
 }
 
-// Fetch data for glass schedule
-$query = "SELECT GlassPickupday, Time, DateUpdated FROM glassSchedule ORDER BY glassScheduleID DESC LIMIT 1";
+// Glass schedule
+$query = "SELECT 'Glass' as Type, GlassPickupday as Day, Time, DateUpdated FROM glassSchedule ORDER BY glassScheduleID DESC LIMIT 1";
 $glassResult = mysqli_query($dbc, $query);
-
-if (!$glassResult) {
-    die('Query failed: ' . mysqli_error($dbc));
+if ($glassResult && mysqli_num_rows($glassResult) > 0) {
+    $schedules[] = mysqli_fetch_assoc($glassResult);
+} else {
+    $schedules[] = ['Type' => 'Glass', 'Day' => '-', 'Time' => '-', 'DateUpdated' => '-'];
 }
 
-// Fetch data for paper schedule
-$query = "SELECT PaperPickupDay, Time, DateUpdated FROM paperSchedule ORDER BY paperScheduleID DESC LIMIT 1";
+// Paper schedule
+$query = "SELECT 'Paper' as Type, PaperPickupDay as Day, Time, DateUpdated FROM paperSchedule ORDER BY paperScheduleID DESC LIMIT 1";
 $paperResult = mysqli_query($dbc, $query);
-
-if (!$paperResult) {
-    die('Query failed: ' . mysqli_error($dbc));
+if ($paperResult && mysqli_num_rows($paperResult) > 0) {
+    $schedules[] = mysqli_fetch_assoc($paperResult);
+} else {
+    $schedules[] = ['Type' => 'Paper', 'Day' => '-', 'Time' => '-', 'DateUpdated' => '-'];
 }
 
-// Fetch data for plastic schedule
-$query = "SELECT PlasticPickupDay, Time, DateUpdated FROM plasticSchedule ORDER BY plasticScheduleID DESC LIMIT 1";
+// Plastic schedule
+$query = "SELECT 'Plastic' as Type, PlasticPickupDay as Day, Time, DateUpdated FROM plasticSchedule ORDER BY plasticScheduleID DESC LIMIT 1";
 $plasticResult = mysqli_query($dbc, $query);
-
-if (!$plasticResult) {
-    die('Query failed: ' . mysqli_error($dbc));
+if ($plasticResult && mysqli_num_rows($plasticResult) > 0) {
+    $schedules[] = mysqli_fetch_assoc($plasticResult);
+} else {
+    $schedules[] = ['Type' => 'Plastic', 'Day' => '-', 'Time' => '-', 'DateUpdated' => '-'];
 }
 ?>
 </div>
@@ -55,7 +64,7 @@ if (!$plasticResult) {
                             <a class="nav-link" href="waste.php">General waste</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="paper.php">Paper </a>
+                            <a class="nav-link" href="paper.php">Paper</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="plastic.php">Plastic</a>
@@ -70,33 +79,23 @@ if (!$plasticResult) {
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
+                            <th scope="col">No</th>
                             <th scope="col">Type</th>
                             <th scope="col">Day</th>
                             <th scope="col">Time</th>
-                            <th scope="col">Last Updated</th>            
-                            <th scope="col">Action</th>
+                            <th scope="col">Last Updated</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                        <?php foreach ($schedules as $schedule) : ?>
                         <tr>
-                            <td><?php echo $counter++; ?></td> 
-                            <td><?php echo $row['UserFirstName']; ?></td>
-                            <td><?php echo $row['UserLastName']; ?></td>
-                            <td><?php echo $row['UserUserName']; ?></td>
-                            <td><?php echo $row['UserAge']; ?></td>
-                            <td><?php echo $row['UserMartialStatus']; ?></td>
-                            <td><?php echo $row['UserOccupation']; ?></td>
-                            <td><?php echo $row['UserContactDetails']; ?></td>
-                            <td><?php echo ($row['CommiteeID']) ? "Committee" : "Resident"; ?></td> 
-                            <td>
-                                <div class="btn-group" style="padding: 5;">
-                                    <br><br>
-                                    <button type="button" class="btn btn-secondary" onclick="deleteUser(<?php echo $row['UserID']; ?>)">Delete </button>
-                                </div>
-                            </td>
+                            <td><?php echo $counter++; ?></td>
+                            <td><?php echo htmlspecialchars($schedule['Type']); ?></td>
+                            <td><?php echo htmlspecialchars($schedule['Day']); ?></td>
+                            <td><?php echo htmlspecialchars($schedule['Time']); ?></td>
+                            <td><?php echo htmlspecialchars($schedule['DateUpdated']); ?></td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>
@@ -104,5 +103,24 @@ if (!$plasticResult) {
     </div>
 </section>
 
-
 <?php include('include/footer.php'); ?>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    function updateSchedule(type) {
+        Swal.fire({
+            title: 'Update Schedule',
+            text: 'Do you want to update the schedule for ' + type + '?',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Redirect to update schedule page
+                window.location.href = 'update-schedule.php?type=' + encodeURIComponent(type);
+            }
+        });
+    }
+</script>

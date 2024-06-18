@@ -18,7 +18,7 @@ if (isset($_GET['page']) && is_numeric($_GET['page'])) {
 $offset = ($current_page - 1) * $records_per_page;
 
 // Make the query to count total records
-$queryCount = "SELECT COUNT(*) as total FROM schedule";
+$queryCount = "SELECT COUNT(*) as total FROM plasticschedule";
 $resultCount = @mysqli_query($dbc, $queryCount);
 $total_records = mysqli_fetch_assoc($resultCount)['total'];
 
@@ -26,9 +26,9 @@ $total_records = mysqli_fetch_assoc($resultCount)['total'];
 $total_pages = ceil($total_records / $records_per_page);
 
 // Make the query for the schedule history with limit and offset
-$queryHistory = "SELECT GarbageDay, Time, DateUpdated
-                FROM schedule
-                ORDER BY ScheduleID DESC
+$queryHistory = "SELECT PlasticPickupDay, Time, DateUpdated
+                FROM plasticschedule
+                ORDER BY plasticScheduleID DESC
                 LIMIT $records_per_page
                 OFFSET $offset";
 $resultHistory = @mysqli_query($dbc, $queryHistory);
@@ -41,15 +41,32 @@ $resultHistory = @mysqli_query($dbc, $queryHistory);
         <div class="heading_container heading_center">
             <h2>Schedule History</h2>
             <hr>
-            <!-- Button group for switching between current and history -->
-            <div class="btn-group" role="group" aria-label="Basic example">
-                <a href="schedule-waste.php" class="btn btn-secondary ">Current</a>
-                <a href="history-waste.php" class="btn btn-primary active">History</a>
-            </div>
+
         </div>
         
         <div class="row">
-            <div class="col-lg-12">
+        <div class="col-lg-3">
+                <div class="pillbox border">
+                    <ul class="nav nav-pills flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link " href="manage-schedule-admin.php">Current Schedule</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="waste.php">General waste</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="paper.php">Paper</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="plastic.php">Plastic</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="glass.php">Glass</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-9">
                 <table class="table">
                     <thead class="thead-dark">
                         <tr>
@@ -65,7 +82,7 @@ $resultHistory = @mysqli_query($dbc, $queryHistory);
                         while ($historyRow = mysqli_fetch_assoc($resultHistory)) : ?>
                             <tr>
                                 <td><?php echo $counter++ ?></td>
-                                <td><?php echo $historyRow['GarbageDay']; ?></td>
+                                <td><?php echo $historyRow['PlasticPickupDay']; ?></td>
                                 <td><?php echo $historyRow['Time']; ?></td>
                                 <td><?php echo $historyRow['DateUpdated']; ?></td>
                             </tr>
@@ -79,7 +96,7 @@ $resultHistory = @mysqli_query($dbc, $queryHistory);
                         <!-- Previous Page Link -->
                         <?php if ($current_page > 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="history-waste.php?page=<?php echo $current_page - 1; ?>" aria-label="Previous">
+                                <a class="page-link" href="history-plastics.php?page=<?php echo $current_page - 1; ?>" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                 </a>
                             </li>
@@ -92,14 +109,14 @@ $resultHistory = @mysqli_query($dbc, $queryHistory);
                         <!-- Page Number Links -->
                         <?php for ($page = 1; $page <= $total_pages; $page++): ?>
                             <li class="page-item <?php echo ($page == $current_page) ? 'active' : ''; ?>">
-                                <a class="page-link" href="history-waste.php?page=<?php echo $page; ?>"><?php echo $page; ?></a>
+                                <a class="page-link" href="history-plastics.php?page=<?php echo $page; ?>"><?php echo $page; ?></a>
                             </li>
                         <?php endfor; ?>
 
                         <!-- Next Page Link -->
                         <?php if ($current_page < $total_pages): ?>
                             <li class="page-item">
-                                <a class="page-link" href="history-waste.php?page=<?php echo $current_page + 1; ?>" aria-label="Next">
+                                <a class="page-link" href="history-plastics.php?page=<?php echo $current_page + 1; ?>" aria-label="Next">
                                     <span aria-hidden="true">&raquo;</span>
                                 </a>
                             </li>
