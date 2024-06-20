@@ -1,9 +1,9 @@
 <?php
 session_start();
 include('include/header.php');
-?>
-</div>
-<?php
+require_once('../Database/database.php'); // Make sure to connect to the database
+global $dbc;
+
 // Pagination variables
 $results_per_page = 10; // Number of results per page
 $current_page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
@@ -16,16 +16,18 @@ $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 $offset = ($current_page - 1) * $results_per_page;
 
 // Fetch donations query with filters and pagination
-$query = "SELECT DonationID, DonationDesc, DonationName, DonationTarget, DonationCollectAmount, DonationStartDate, DonationEndDate, DonationStatus 
-          FROM donation";
+$query = "SELECT d.DonationID, d.DonationDesc, d.DonationName, d.DonationTarget, d.DonationStartDate, d.DonationEndDate, d.DonationStatus, 
+                 COALESCE(SUM(dj.DonationTotal), 0) AS DonationCollectionAmount
+          FROM donation d
+          LEFT JOIN donationjoined dj ON d.DonationID = dj.DonationID";
 
 // Apply filters
 $whereClause = " WHERE 1";
 if (!empty($filterStatus)) {
-    $whereClause .= " AND DonationStatus = '$filterStatus'";
+    $whereClause .= " AND d.DonationStatus = '$filterStatus'";
 }
 
-$query .= $whereClause . " ORDER BY DonationID $filterOrder LIMIT $offset, $results_per_page";
+$query .= $whereClause . " GROUP BY d.DonationID ORDER BY d.DonationID $filterOrder LIMIT $offset, $results_per_page";
 
 $result = mysqli_query($dbc, $query);
 
@@ -34,9 +36,8 @@ $count_query = "SELECT COUNT(*) AS total FROM donation" . $whereClause;
 $count_result = mysqli_query($dbc, $count_query);
 $row_count = mysqli_fetch_assoc($count_result)['total'];
 $total_pages = ceil($row_count / $results_per_page);
-
 ?>
-
+</div>
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
@@ -49,12 +50,6 @@ $total_pages = ceil($row_count / $results_per_page);
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
                             <a class="nav-link active" href="manage-donation.php">Current Donation</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="donation-joined.php">Donations Joined</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="add-donation.php">Add Donations</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="donation-history.php">History</a>
@@ -102,7 +97,7 @@ $total_pages = ceil($row_count / $results_per_page);
                             <th scope="col">Start Date</th>
                             <th scope="col">End Date</th>
                             <th scope="col">Priority</th>
-                            <th scope="col">Action</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -114,18 +109,11 @@ $total_pages = ceil($row_count / $results_per_page);
                                 <td><?php echo $row['DonationName']; ?></td>
                                 <td style="text-align: justify;"><?php echo $row['DonationDesc']; ?></td>
                                 <td><?php echo $row['DonationTarget']; ?></td>
-                                <td><?php echo $row['DonationCollectAmount']; ?></td>
+                                <td><?php echo number_format($row['DonationCollectionAmount'], 2); ?></td>
                                 <td><?php echo $row['DonationStartDate']; ?></td>
                                 <td><?php echo $row['DonationEndDate']; ?></td>
                                 <td><?php echo $row['DonationStatus']; ?></td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-warning" onclick="deleteDonation(<?php echo $row['DonationID']; ?>)"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                                        <button type="button" class="btn btn-secondary" onclick="editDonation(<?php echo $row['DonationID']; ?>)" data-toggle="modal" data-target="#editDonationModal">
-                                            <i class="fa fa-pencil" aria-hidden="true"></i>
-                                        </button>
-                                    </div>
-                                </td>
+                                
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -149,133 +137,7 @@ $total_pages = ceil($row_count / $results_per_page);
     </div>
 </section>
 
-<!-- Modal for updating donation -->
-<div class="modal fade" id="editDonationModal" tabindex="-1" role="dialog" aria-labelledby="editDonationModalLabel"  aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editDonationModalLabel">Edit Donation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Form for updating donation details -->
-                <form id="update_donation.php" action="update_donation.php" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" id="editDonationID" name="DonationID" value="">
-                    <div class="form-group">
-                        <label for="DonationName">Title:</label>
-                        <input type="text" class="form-control" id="DonationName" name="DonationName"  value="<?php echo $DonationName?>">
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationDesc">Description:</label>
-                        <textarea class="form-control" id="editDonationDesc" name="DonationDesc" rows="5"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationTarget">Target:</label>
-                        <input type="text" class="form-control" id="editDonationTarget" name="DonationTarget" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationStartDate">Start Date:</label>
-                        <input type="date" class="form-control" id="editDonationStartDate" name="DonationStartDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationEndDate">End Date:</label>
-                        <input type="date" class="form-control" id="editDonationEndDate" name="DonationEndDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationStatus">Priority:</label>
-                        <select class="form-control" id="editDonationStatus" name="DonationStatus" required>
-                            <option value="High">High Priority</option>
-                            <option value="Medium">Medium Priority</option>
-                            <option value="Low">Low Priority</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationStatus">Status:</label>
-                        <select class="form-control" id="editDonationStatus" name="status" required>
-                            <option value="Ongoing">Ongoing</option>
-                            <option value="Completed">Completed</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editDonationImage">Image:</label>
-                        <input type="file" class="form-control-file" id="editDonationImage" name="image" accept=".jpg, .jpeg, .png">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="submitUpdate()">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-                      // Function to submit the form data
-                      function submitForm() {
-                        // Submit the form
-                        $('#updateDonationForm form').submit();
-                      }
-                    </script>
-                  </div>
+
+
+
 <?php include('include/footer.php'); ?>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Function to delete donation
-    function deleteDonation(DonationID) {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this donation!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Confirm',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Redirect to delete-donation.php with DonationID
-                window.location.href = 'delete-donation.php?DonationID=' + DonationID;
-            }
-        });
-    }
-
-   
-
-    // Function to submit update form
-    // Function to submit update form
-    function submitUpdate() {
-        // Serialize the form data
-        var formData = new FormData($('#updateDonationForm')[0]);
-
-        // Send AJAX request
-        $.ajax({
-            url: 'update_donation.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                // Handle success response (if any)
-                console.log(response);
-                // Close the modal
-                $('#editDonationModal').modal('hide');
-                // Optionally, you can reload the donation dashboard or perform other actions
-                location.reload(); // Reload the page to reflect changes
-            },
-            error: function(xhr, status, error) {
-                // Handle error response
-                console.error(xhr.responseText);
-                // Optionally, show an error message to the user
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to update donation. Please try again later.',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                });
-            }
-        });
-    }
-</script>

@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="pillbox border">
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link " href="manage-donation.php">Current Schedule</a>
+                            <a class="nav-link " href="manage-donation.php">Current Donations</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="donation-joined.php">Donations Joined</a>

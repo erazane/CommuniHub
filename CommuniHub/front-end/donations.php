@@ -91,7 +91,7 @@ if (!$result) {
                     echo '<div class="row">';
                 }
             ?>
-            <div class="col-md-4">
+            <div class="col-md-4" style="margin-bottom: 50px;">
                 <div class="card h-100"> <!-- Ensure cards have equal height -->
                     <img class="card-img-top img-fluid" src="../Committee/images/donations/<?php echo htmlspecialchars($image); ?>" alt="<?php echo htmlspecialchars($DonationName); ?>" style="height: 200px; object-fit: cover;">
                     <div class="card-body">
@@ -115,6 +115,7 @@ if (!$result) {
                     </div>
                 </div>
             </div>
+            <br>
             <?php
                 // Close the row after every third card
                 $count++;

@@ -109,10 +109,10 @@ if (isset($_SESSION['adminName'])) {
                   <a class="nav-link" href="manage-donation.php">Donations</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="manage-complaints.php">Complaints</a>
+                  <a class="nav-link" href="manage-complaint.php">Complaints</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="manage-discussion">Discussion</a>
+                  <a class="nav-link" href="manage-discussion.php">Discussion</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link" href="admin-logout.php">Logout</a>

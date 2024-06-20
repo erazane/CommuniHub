@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="date" class="form-control" id="ActivityDate" name="ActivityDate" required>
                             </div>
                             <div class="form-group">
-                                <label for="ActivityTime">time:</label>
+                                <label for="ActivityTime">Time:</label>
                                 <input type="time" class="form-control" id="ActivityTime" name="ActivityTime" required>
                             </div>
                             <div class="form-group">
@@ -152,6 +152,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="text-right">
                                 <button type="button" onclick="addActivities();" class="btn btn-primary btn-lg">Confirm</button>
                             </div>
+                            
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                             <script>
                                function addActivities() {
                                     var ActivityName = document.getElementById("ActivityName").value.trim();
@@ -172,7 +176,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     }
                                             // Check if swal is called
                                             console.log("SweetAlert called");
-                                    swal({
+                                        Swal.fire({
                                         title: "Add this activity?",
                                                 text: "Click confirm if you would like to add this activity",
                                                 icon: "info",
