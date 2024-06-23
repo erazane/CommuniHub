@@ -67,12 +67,6 @@ $totalPages = ceil($row_count / $results_per_page);
                             <a class="nav-link " href="manage-activities.php">Current Activities</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="activities-joined.php">Activities joined</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="add-activities.php">Add Activities</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link active" href="activities-history.php">History</a>
                         </li>
                     </ul>

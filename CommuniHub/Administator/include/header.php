@@ -112,6 +112,9 @@ if (isset($_SESSION['adminName'])) {
                   <a class="nav-link" href="manage-complaint.php">Complaints</a>
                 </li>
                 <li class="nav-item">
+                  <a class="nav-link" href="manage-activities.php">Activity</a>
+                </li>
+                <li class="nav-item">
                   <a class="nav-link" href="manage-discussion.php">Discussion</a>
                 </li>
                 <li class="nav-item">

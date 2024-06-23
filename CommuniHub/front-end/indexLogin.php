@@ -39,9 +39,9 @@ session_start();
 
   
 
-   <!-- service section -->
+  <!-- service section -->
 
-   <section class="service_section layout_padding">
+  <section class="service_section layout_padding">
     <div class="container ">
       <div class="heading_container heading_center">
         <h2> Our Services </h2>
@@ -50,11 +50,11 @@ session_start();
         <div class="col-sm-6 col-md-4 mx-auto">
           <div class="box ">
             <div class="img-box">
-              <img src="images/s1.png" alt="" />
+            <i class="fa fa-comments-o fa-5x" aria-hidden="true"></i>
             </div>
             <div class="detail-box">
               <h5>
-                Centralised communication
+               Discussion Board
               </h5>
               <p>
                Seamlessly bringing residents together, our platform ensures efficient and effective 
@@ -66,11 +66,11 @@ session_start();
         <div class="col-sm-6 col-md-4 mx-auto">
           <div class="box ">
             <div class="img-box">
-              <img src="images/s1.png" alt="" />
+            <i class="fa fa-star fa-5x" aria-hidden="true"></i>
             </div>
             <div class="detail-box">
               <h5>
-                Activity Scheduling
+                Activities
               </h5>
               <p>
                 Streamlines your suburban life with efficient activity scheduling. Whether it's community events, sports matches,
@@ -82,7 +82,7 @@ session_start();
         <div class="col-sm-6 col-md-4 mx-auto">
           <div class="box ">
             <div class="img-box">
-              <img src="images/s1.png" alt="" />
+            <i class="fa fa-calendar fa-5x" aria-hidden="true"></i>
             </div>
             <div class="detail-box">
               <h5>
@@ -97,7 +97,7 @@ session_start();
         <div class="col-sm-6 col-md-4 mx-auto">
           <div class="box ">
             <div class="img-box">
-              <img src="images/s1.png" alt="" />
+            <i class="fa fa-money fa-5x" aria-hidden="true"></i>
             </div>
             <div class="detail-box">
               <h5>
@@ -112,7 +112,7 @@ session_start();
         <div class="col-sm-6 col-md-4 mx-auto">
           <div class="box ">
             <div class="img-box">
-              <img src="images/s2.png" alt="" />
+            <i class="fa fa-flag fa-5x" aria-hidden="true"></i>
             </div>
             <div class="detail-box">
               <h5>
@@ -127,15 +127,14 @@ session_start();
         <div class="col-sm-6 col-md-4 mx-auto">
           <div class="box ">
             <div class="img-box">
-              <img src="images/s3.png" alt="" />
+            <i class="fa fa-user fa-5x" aria-hidden="true"></i>
             </div>
             <div class="detail-box">
               <h5>
-                Alerts
+               User Profile
               </h5>
               <p>
-              Whether it's weather warnings, emergency notifications, or 
-              important community updates, our system keeps you up-to-date, ensuring your safety and well-being in the suburb."
+              An easy and comprehensive user profile where you can view your community engagement such as activity joined,donation history and user complaints and history.
               </p>
             </div>
           </div>

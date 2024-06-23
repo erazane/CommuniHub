@@ -196,7 +196,7 @@ $total_pages = ceil($row_count / $results_per_page);
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to delete-donation.php with DonationID
-                window.location.href = 'update_donation.php?DonationID=' + DonationID;
+                window.location.href = 'update-donation.php?DonationID=' + DonationID;
             }
         });
     }

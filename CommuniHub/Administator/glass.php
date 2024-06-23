@@ -41,8 +41,7 @@ $resultHistory = mysqli_query($dbc, $queryHistory);
             <hr>
             <!-- Button group for switching between current and history -->
             <div class="btn-group" role="group" aria-label="Basic example">
-                <a href="schedule-glass.php" class="btn btn-secondary ">Current</a>
-                <a href="history-glass.php" class="btn btn-primary active">History</a>
+                
             </div>
         </div>
         

@@ -20,7 +20,7 @@ $counter = 1;
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
         <div class="heading_container heading_center">
-            <h2>Activity Board</h2>
+            <h2>Administrator Board</h2>
             <hr>
         </div>
         <div class="row">

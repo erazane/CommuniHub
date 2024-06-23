@@ -90,8 +90,8 @@ if (isset($_POST['Submit'])) {
                     <!-- Right column for user details -->
                     <div class="col-md-6">
                         <div class="login-title">
-                            <h2>Committee Login</h2>
-                            <!-- <p>Dont have an account? <a href="#" class="link-primary">Create your account here !</a></p> -->
+                            <h2>Resident Login</h2>
+                            <p>Dont have an account? <a href="#" class="link-primary">Create your account here !</a></p>
                         </div>
                         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
 

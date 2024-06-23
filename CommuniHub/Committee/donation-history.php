@@ -3,15 +3,50 @@ session_start();
 include('include/header.php');
 ?>
 </div>
-<!-- end header section -->
 <?php
 require_once('../Database/database.php');
+global $dbc;
 
-// Make the query
-$query = "SELECT DonationID, DonationDesc, DonationName, DonationTarget,DonationCollectAmount, DonationStartDate, DonationEndDate, DonationStatus,status
- FROM donation WHERE status='Completed' ORDER BY DonationID ASC";
+// Pagination variables
+$results_per_page = 10; // Number of results per page
+$current_page = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
 
-$result = mysqli_query($dbc, $query); // Run the query
+// Default filter values
+$filterStatus = isset($_GET['filterStatus']) ? $_GET['filterStatus'] : '';
+$filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
+
+// Calculate the starting point of the results
+$offset = ($current_page - 1) * $results_per_page;
+
+// Fetch donations query with filters and pagination
+$query = "SELECT d.DonationID, d.DonationDesc, d.DonationName, d.DonationTarget, 
+                 COALESCE(SUM(dj.DonationTotal), 0) AS DonationCollectionAmount, 
+                 d.DonationStartDate, d.DonationEndDate, d.DonationStatus, d.status
+          FROM donation d 
+          LEFT JOIN donationjoined dj ON d.DonationID = dj.DonationID
+          WHERE d.status = 'Completed'";
+
+// Apply filters
+$whereClause = "";
+if (!empty($filterStatus)) {
+    $whereClause .= " AND d.DonationStatus = '$filterStatus'";
+}
+
+$query .= $whereClause . " GROUP BY d.DonationID ORDER BY d.DonationID $filterOrder LIMIT $offset, $results_per_page";
+
+$result = mysqli_query($dbc, $query);
+if (!$result) {
+    die('Query Error: ' . mysqli_error($dbc));
+}
+
+// Count total number of results for pagination
+$count_query = "SELECT COUNT(*) AS total FROM donation d WHERE d.status = 'Completed'" . $whereClause;
+$count_result = mysqli_query($dbc, $count_query);
+if (!$count_result) {
+    die('Count Query Error: ' . mysqli_error($dbc));
+}
+$row_count = mysqli_fetch_assoc($count_result)['total'];
+$total_pages = ceil($row_count / $results_per_page);
 ?>
 
 <section class="service_section layout_padding wider_section">
@@ -38,6 +73,32 @@ $result = mysqli_query($dbc, $query); // Run the query
                         </li>
                     </ul>
                 </div>
+                <br>
+                <!-- Filter -->
+                <form class="form-inline justify-content-end mb-4" method="GET" action="">
+                    <div class="form-row align-items-center">
+                        <div class="col-md-auto mb-2">
+                            <label for="filterStatus" class="mr-2">Status:</label>
+                            <select class="form-control" id="filterStatus" name="filterStatus">
+                                <option value="" <?php if ($filterStatus == '') echo 'selected'; ?>>All</option>
+                                <option value="High" <?php if ($filterStatus == 'High') echo 'selected'; ?>>High</option>
+                                <option value="Medium" <?php if ($filterStatus == 'Medium') echo 'selected'; ?>>Medium</option>
+                                <option value="Low" <?php if ($filterStatus == 'Low') echo 'selected'; ?>>Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-auto mb-2">
+                            <label for="filterOrder" class="mr-2">Order:</label>
+                            <select class="form-control" id="filterOrder" name="filterOrder">
+                                <option value="DESC" <?php if ($filterOrder == 'DESC') echo 'selected'; ?>>Descending</option>
+                                <option value="ASC" <?php if ($filterOrder == 'ASC') echo 'selected'; ?>>Ascending</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2 w-100">
+                            <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                        </div>
+                    </div>
+                </form>
+                <!-- End Filter -->
             </div>
             <div class="col-lg-9">
                 <table class="table">
@@ -63,16 +124,29 @@ $result = mysqli_query($dbc, $query); // Run the query
                             <td><?php echo $row['DonationName']; ?></td>
                             <td style="text-align: justify;"><?php echo $row['DonationDesc']; ?></td>
                             <td><?php echo $row['DonationTarget']; ?></td>
-                            <td><?php echo $row['DonationCollectAmount']?></td>
+                            <td><?php echo $row['DonationCollectionAmount']; ?></td>
                             <td><?php echo $row['DonationStartDate']; ?></td>
                             <td><?php echo $row['DonationEndDate']; ?></td>
                             <td><?php echo $row['DonationStatus']; ?></td>
-                            
                             
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+                <hr>
+                <!-- Pagination -->
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <?php for ($page = 1; $page <= $total_pages; $page++) : ?>
+                            <li class="page-item <?php if ($current_page == $page) echo 'active'; ?>">
+                                <a class="page-link" href="manage-donation.php?page=<?php echo $page; ?><?php if (!empty($filterStatus)) echo '&filterStatus=' . $filterStatus; ?><?php if (!empty($filterOrder)) echo '&filterOrder=' . $filterOrder; ?>">
+                                    <?php echo $page; ?>
+                                </a>
+                            </li>
+                        <?php endfor; ?>
+                    </ul>
+                </nav>
+                <!-- End Pagination -->
             </div>
         </div>
     </div>

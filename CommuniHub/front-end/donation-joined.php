@@ -10,12 +10,21 @@ require_once('../Database/database.php');
 $UserID = $_SESSION["UserID"];
 $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
-// Define the query to fetch complaints made by the user that are not 'completed'
-$query = "SELECT c.ComplaintID, c.ComplainTitle, c.ComplaintDesc, c.ComplaintDate, c.ComplaintType, c.UserID, c.image 
-          FROM complaint c 
-          LEFT JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID
-          WHERE c.UserID = $UserID AND (r.status != 'Completed' OR r.status IS NULL)
-          ORDER BY c.ComplaintDate $filterOrder";
+// Pagination variables
+$recordsPerPage = 10; // Number of records to display per page
+$currentPage = isset($_GET['page']) ? $_GET['page'] : 1; // Current page number
+
+// Calculate the offset for the query based on current page
+$offset = ($currentPage - 1) * $recordsPerPage;
+
+// Define the query to fetch donations made by the user with pagination
+$query = "SELECT dj.DateJoined, d.DonationName, d.DonationDesc, dj.DonationTotal
+          FROM donationjoined dj
+          INNER JOIN donation d ON dj.DonationID = d.DonationID
+          WHERE dj.UserID = $UserID
+          ORDER BY dj.DateJoined $filterOrder
+          LIMIT $recordsPerPage
+          OFFSET $offset";
 
 $result = mysqli_query($dbc, $query); // Run the query
 
@@ -24,6 +33,19 @@ if (!$result) {
     echo "Error: " . mysqli_error($dbc);
     exit();
 }
+
+// Query to count total number of records (for pagination)
+$countQuery = "SELECT COUNT(*) AS totalRecords
+               FROM donationjoined dj
+               INNER JOIN donation d ON dj.DonationID = d.DonationID
+               WHERE dj.UserID = $UserID";
+$countResult = mysqli_query($dbc, $countQuery);
+$rowCount = mysqli_fetch_assoc($countResult);
+$totalRecords = $rowCount['totalRecords'];
+
+// Calculate total pages
+$totalPages = ceil($totalRecords / $recordsPerPage);
+
 ?>
 
 <section class="service_section layout_padding wider_section">
@@ -33,10 +55,6 @@ if (!$result) {
             <hr>
         </div>
         <div class="row justify-content-between align-items-center mt-3">
-            <div class="col-md-3">
-                 <a class="btn btn-primary active" href="pending-complaints.php">Pending</a>
-                <a class="btn btn-primary" href="resolved-complaints.php">History</a>
-            </div>
             <div class="col-md-9">
                 <!-- Filter Form -->
                 <form class="form-inline justify-content-end" method="GET" action="">
@@ -57,61 +75,44 @@ if (!$result) {
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">No</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Type</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Image</th>
+                            <th scope="col">Donation Title</th>
+                            <th scope="col">Donation Description</th>
+                            <th scope="col">Date Joined</th>
+                            <th scope="col">Donation Total</th>
                         </tr>
                     </thead>
                     <tbody>
-
-
                         <?php 
-                        $counter = 1; 
+                        $counter = ($currentPage - 1) * $recordsPerPage + 1; // Counter for displaying serial number
                         while ($row = mysqli_fetch_assoc($result)) : ?>
                             <tr>
                                 <td><?php echo $counter++; ?></td>
-                                <td><?php echo $row['ComplainTitle']; ?></td>
-                                <td style="text-align: justify;"><?php echo $row['ComplaintDesc']; ?></td>
-                                <td><?php echo $row['ComplaintType']; ?></td>
-                                <td><?php echo $row['ComplaintDate']; ?></td>
-                                <td>
-                                    <?php if (!empty($row['image'])) : ?>
-                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#imageModal<?php echo $row['ComplaintID']; ?>">
-                                            View 
-                                        </button>
-                                    <?php else : ?>
-                                        No Image
-                                    <?php endif; ?>
-                                </td>
+                                <td><?php echo $row['DonationName']; ?></td>
+                                <td><?php echo $row['DonationDesc']; ?></td>
+                                <td><?php echo $row['DateJoined']; ?></td>
+                                <td>RM<?php echo $row['DonationTotal']; ?></td>
                             </tr>
-
-                            <!-- Modal -->
-                            <div class="modal fade" id="imageModal<?php echo $row['ComplaintID']; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel"><?php echo $row['ComplainTitle']; ?></h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="profile_picture_container text-center mb-4" style="padding: 10%;">
-                                                <img class="img-fluid" src="../front-end/images/complaint/<?php echo $row['image'] ? $row['image'] : "nodata.jpg"; ?>" alt="<?php echo $row['ComplainTitle']; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         <?php endwhile; ?>
                     </tbody>
                 </table>
+              
                 <hr>
+                  <!-- Pagination Links -->
+                  <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        <?php if ($currentPage > 1) : ?>
+                            <li class="page-item"><a class="page-link" href="?page=<?php echo ($currentPage - 1); ?>&filterOrder=<?php echo $filterOrder; ?>">Previous</a></li>
+                        <?php endif; ?>
+
+                        <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
+                            <li class="page-item <?php if ($i == $currentPage) echo 'active'; ?>"><a class="page-link" href="?page=<?php echo $i; ?>&filterOrder=<?php echo $filterOrder; ?>"><?php echo $i; ?></a></li>
+                        <?php endfor; ?>
+
+                        <?php if ($currentPage < $totalPages) : ?>
+                            <li class="page-item"><a class="page-link" href="?page=<?php echo ($currentPage + 1); ?>&filterOrder=<?php echo $filterOrder; ?>">Next</a></li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <a class="btn btn-primary me-md-2" href="UserProfile-read.php">Back</a>
                 </div>

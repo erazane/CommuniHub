@@ -7,34 +7,32 @@ include('include/header.php');
 <?php
 require_once('../Database/database.php');
 
-// Initialize filter variables
-$filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
-$filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
-$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+// Fetch filter values
+$filterType = isset($_GET['filterType']) ? mysqli_real_escape_string($dbc, $_GET['filterType']) : '';
+$filterOrder = isset($_GET['filterOrder']) ? mysqli_real_escape_string($dbc, $_GET['filterOrder']) : 'DESC';
 
-// Pagination variables
-$results_per_page = 10;
-$offset = ($current_page - 1) * $results_per_page;
+// Pagination settings
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 10; // Number of records per page
+$offset = ($page - 1) * $limit;
 
-// Construct the base query
+// Make the query with filters and pagination
 $query = "
-    SELECT a.ActivityID, a.Activityname, a.ActivityLocation , a.ActivityDate, a.ActivityTime, a.ActivityType,
+    SELECT a.ActivityID, a.Activityname, a.ActivityLocation, a.ActivityDate, a.ActivityTime, a.ActivityType, a.Status,
            COUNT(aj.UserID) AS NumJoined
     FROM activities a
-    LEFT JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID 
-    WHERE a.Status = 'Completed'
-";
+    LEFT JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID
+    WHERE a.Status = 'Ongoing'";
 
-// Apply filters
-if (!empty($filterType)) {
+if ($filterType) {
     $query .= " AND a.ActivityType = '$filterType'";
 }
 
-$query .= " GROUP BY a.ActivityID, a.Activityname, a.ActivityLocation , a.ActivityDate, a.ActivityTime, a.ActivityType
-           ORDER BY a.ActivityID $filterOrder
-           LIMIT $offset, $results_per_page";
+$query .= " GROUP BY a.ActivityID, a.Activityname, a.ActivityLocation, a.ActivityDate, a.ActivityTime, a.ActivityType, a.Status";
+$query .= " ORDER BY a.ActivityDate $filterOrder, a.ActivityTime $filterOrder";
+$query .= " LIMIT $limit OFFSET $offset";
 
-$result = mysqli_query($dbc, $query); // Run the query
+$result = mysqli_query($dbc, $query);
 
 // Check if query was successful
 if (!$result) {
@@ -43,15 +41,21 @@ if (!$result) {
     exit();
 }
 
-// Count total number of results for pagination
-$count_query = "SELECT COUNT(*) AS total FROM activities WHERE Status = 'Completed'";
-$count_result = mysqli_query($dbc, $count_query);
-if (!$count_result) {
-    die('Count Query Error: ' . mysqli_error($dbc));
+// Count total records for pagination
+$countQuery = "
+    SELECT COUNT(*) AS total
+    FROM activities
+    WHERE Status = 'Ongoing'";
+
+if ($filterType) {
+    $countQuery .= " AND ActivityType = '$filterType'";
 }
-$row_count = mysqli_fetch_assoc($count_result)['total'];
-$totalPages = ceil($row_count / $results_per_page);
+
+$countResult = mysqli_query($dbc, $countQuery);
+$totalRecords = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalRecords / $limit);
 ?>
+
 
 <section class="service_section layout_padding wider_section">
     <div class="container" style="max-width: 1500px;">
@@ -64,16 +68,10 @@ $totalPages = ceil($row_count / $results_per_page);
                 <div class="pillbox border">
                     <ul class="nav nav-pills flex-column">
                         <li class="nav-item">
-                            <a class="nav-link " href="manage-activities.php">Current Activities</a>
+                            <a class="nav-link active" href="manage-activities.php">Current Activities</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="activities-joined.php">Activities joined</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="add-activities.php">Add Activities</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="activities-history.php">History</a>
+                            <a class="nav-link" href="activities-history.php">History</a>
                         </li>
                     </ul>
                 </div>
@@ -90,7 +88,6 @@ $totalPages = ceil($row_count / $results_per_page);
                                 <option value="Fitness-Classes" <?= ($filterType == 'Fitness-Classes') ? 'selected' : '' ?>>Fitness-Classes</option>
                                 <option value="Holiday-Celebrations" <?= ($filterType == 'Holiday-Celebrations') ? 'selected' : '' ?>>Holiday Celebrations</option>
                                 <option value="Workshops" <?= ($filterType == 'Workshops') ? 'selected' : '' ?>>Workshops</option>
-                                <option value="Other" <?= ($filterType == 'Other') ? 'selected' : '' ?>>Other</option>
                             </select>
                         </div>
                         
@@ -119,20 +116,25 @@ $totalPages = ceil($row_count / $results_per_page);
                             <th scope="col">Time</th>
                             <th scope="col">Type</th>
                             <th scope="col">Participation</th>
+                        
                         </tr>
                     </thead>
                     <tbody>
-                        <?php
-                        $counter = ($current_page - 1) * $results_per_page + 1;
-                        while ($row = mysqli_fetch_assoc($result)) : ?>
-                        <tr>
-                            <td><?php echo $counter++; ?></td>
+                    <?php
+                        $counter=1;
+                         while ($row = mysqli_fetch_assoc($result)) : ?>
+                            <tr>
+                            <td><?php echo $counter++ ?></td>
                             <td><?php echo $row['Activityname']; ?></td>
                             <td style="text-align: justify;"><?php echo $row['ActivityLocation']; ?></td>
                             <td><?php echo $row['ActivityDate']; ?></td>
                             <td><?php echo $row['ActivityTime']; ?></td>
                             <td><?php echo $row['ActivityType']; ?></td>
                             <td><?php echo $row['NumJoined']; ?></td>
+                            <td>
+                                     
+                                </div>
+                            </td>
                         </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -141,46 +143,31 @@ $totalPages = ceil($row_count / $results_per_page);
                 <!-- Pagination -->
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
-                        <?php if ($current_page > 1): ?>
-                            <li class="page-item"><a class="page-link" href="?page=<?= $current_page - 1 ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>">Previous</a></li>
+                        <?php if ($page > 1): ?>
+                            <li class="page-item"><a class="page-link" href="?page=<?= $page - 1 ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>">Previous</a></li>
                         <?php endif; ?>
                         
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                            <li class="page-item <?= ($current_page == $i) ? 'active' : '' ?>">
+                            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
                                 <a class="page-link" href="?page=<?= $i ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>"><?= $i ?></a>
                             </li>
                         <?php endfor; ?>
                         
-                        <?php if ($current_page < $totalPages): ?>
-                            <li class="page-item"><a class="page-link" href="?page=<?= $current_page + 1 ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>">Next</a></li>
+                        <?php if ($page < $totalPages): ?>
+                            <li class="page-item"><a class="page-link" href="?page=<?= $page + 1 ?>&filterType=<?= $filterType ?>&filterOrder=<?= $filterOrder ?>">Next</a></li>
                         <?php endif; ?>
                     </ul>
                 </nav>
-                <!-- End Pagination -->
+
             </div>
+            
         </div>
     </div>
 </section>
 
-<?php include('include/footer.php'); ?>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<script>
-    function deleteActivity(ActivityID) {
-        console.log("Deleting activity with ID: " + ActivityID);
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'You will not be able to recover this.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Confirm',
-            cancelButtonText: 'Cancel',
-            reverseButtons: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Redirect to delete-activities.php with ActivityID
-                window.location.href = 'delete-activities.php?ActivityID=' + ActivityID;
-            }
-        });
-    }
-</script>
+
+
+
+
+<?php include('include/footer.php'); ?>

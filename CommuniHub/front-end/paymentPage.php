@@ -223,7 +223,7 @@ if ($result) {
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-center mt-4">
-                                    <button type="button" onclick="history.back();" class="btn btn-primary btn-lg mr-2">Back</button>
+                                    
                                     <button type="button" onclick="confirmPayment()" class="btn btn-primary btn-lg">Proceed</button>
                                 </div>
                             </form>
@@ -277,7 +277,13 @@ if ($result) {
                              </div>
                            </div>
                            <br>
-                           <p style="color: #ff6a19; font-size: 16px;" class="mt-2"><b>Note:</b> When you make a transfer, please send the evidence to scholarshipsheikh@gmail.com for confirmation. Thank you.</p>
+                           <div class="d-flex justify-content-center mt-4">
+                                    
+                           <a href="uploadReceipt.php?UserID=<?php echo $_SESSION['UserID']; ?>&DonationID=<?php echo $DonationID; ?>" class="btn btn-primary btn-lg">Upload Receipt</a>
+
+                                </div>
+                           <br>
+                           <!-- <p style="color: #ff6a19; font-size: 16px;" class="mt-2"><b>Note:</b> When you make a transfer, please send the evidence to communiHub@gmail.com for confirmation. Thank you.</p> -->
                            <br>
                            <!-- <div class="text-center">
                                 <button type="button" onclick="addReceipt();" class="btn btn-primary btn-lg">Confirm</button>
@@ -376,7 +382,11 @@ if ($result) {
                         </div>
                     </div>
                 </div>
-
+                <br>
+                <br>
+                <div class="text-right">
+                <button type="button" onclick="history.back();" class="btn btn-primary btn-lg mr-2">Back</button>
+                </div>
             </div>
             
         </div>
@@ -436,29 +446,6 @@ if ($result) {
     }
 </script>
 
-<!-- <script>
-    function addReceipt() {
-    var ReceiptImages = document.getElementById("image").value.trim();
-    if (!ReceiptImages) {
-        Swal.fire("Error!", "Please select an image to upload.", "error");
-        return;
-    }
 
-    Swal.fire({
-        title: "Would you like to upload this image?",
-        text: "Click confirm if you wish to proceed",
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Trigger click event on file input to submit the form
-            document.getElementById("receipt").click();
-        }
-    });
-}
 
-    </script> -->
 <?php include('include/footer.php'); ?>
