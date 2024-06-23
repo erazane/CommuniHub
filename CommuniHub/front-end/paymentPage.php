@@ -155,7 +155,7 @@ if ($result) {
                         <div class="col-md-12">
                         <div class="card-body">
                             <form id="paymentdetails" method="POST">
-                                <h3>Card Details</h3>
+                                <h5>Card Details</h5>
                                 <div class="form-group">
                                     <label for="DonationTotal">Donation Amount:</label>
                                     <div class="input-group">
@@ -239,8 +239,8 @@ if ($result) {
                     </div>
                     <div class="col-md-12">
                         <div class="card-body">
-                           <h3>Bank Transfer</h3>
-                           <h5>If you are unable to use online banking via card, you may transfer funds to our bank account.</h5>
+                           <h5>Bank Transfer</h5>
+                           <h6>If you are unable to use online banking via card, you may transfer funds to our bank account.</h6>
                             <br>
                             <hr>
                            <p>
@@ -255,7 +255,7 @@ if ($result) {
                             </p>
 
                             <hr>
-                            <h3>QR Transfer</h3>
+                            <h5>QR Transfer</h5>
                            <!-- <h5>If you prefer,you may also use QR transfer.If you do choose this method of payment,<br>then please upload the receipt aswell.</h5> -->
                            <!-- <form id="receipt" enctype="multipart/form-data">
                             <input type="file" name="ReceiptImages" id="image" accept=".jpg, .jpeg, .png" > -->

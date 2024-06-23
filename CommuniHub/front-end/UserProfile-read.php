@@ -56,26 +56,27 @@ if ($result) {
 }
 
 // query for activity joined that has been completed
-$query = "SELECT COUNT(*) AS history_count FROM activities a JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID  WHERE aj.UserID = $UserID AND a.Status = 'Completed'";
-$result = mysqli_query($dbc, $query);
+// $query = "SELECT COUNT(*) AS history_count FROM activities a JOIN activitiesJoined aj ON a.ActivityID = aj.ActivityID  WHERE aj.UserID = $UserID AND a.Status = 'Completed'";
+// $result = mysqli_query($dbc, $query);
 
-if ($result) {
-    $row = mysqli_fetch_assoc($result);
-    $history_count = $row["history_count"];
-} else {
-    $history_count = 0;
-}
+// if ($result) {
+//     $row = mysqli_fetch_assoc($result);
+//     $history_count = $row["history_count"];
+// } else {
+//     $history_count = 0;
+// }
 
 // query for donations joined
-$query = "SELECT COUNT(*) AS DonationCount FROM donations d JOIN donationJoined dj ON  d.donationID = dj.donationID WHERE dj.UserId =$UserID";
-$result = mysqli_query($dbc, $query);
+// $query = "SELECT COUNT(*) AS DonationCount FROM donations d JOIN donationJoined dj ON d.donationID = dj.donationID WHERE dj.UserID = $UserID";
+// $result = mysqli_query($dbc, $query);
 
-if ($result) {
-    $row = mysqli_fetch_assoc($result);
-    $DonationCount = $row["DonationCount"];
-} else {
-    $DonationCount = 0;
-}
+// if ($result) {
+//     $row = mysqli_fetch_assoc($result);
+//     $DonationCount = $row["DonationCount"];
+// } else {
+//     $DonationCount = 0;
+// }
+
 
 // query for complaints pending
 $query = "    SELECT COUNT(*) AS pendingComplaintCount FROM complaint c LEFT JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID WHERE r.ComplaintID IS NULL AND c.UserID = '$UserID' ";
@@ -89,15 +90,15 @@ if ($result) {
 }
 
 // query for resolved complaints
-$query = "    SELECT COUNT(*) AS HistoryComplaintCount FROM complaint c JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID WHERE r.status = 'Completed' AND c.UserID = '$UserID'";
-$result = mysqli_query($dbc, $query);
+// $query = "    SELECT COUNT(*) AS HistoryComplaintCount FROM complaint c JOIN respondComplaint r ON c.ComplaintID = r.ComplaintID WHERE r.status = 'Completed' AND c.UserID = '$UserID'";
+// $result = mysqli_query($dbc, $query);
 
-if ($result) {
-    $row = mysqli_fetch_assoc($result);
-    $HistoryComplaintCount = $row["HistoryComplaintCount"];
-} else {
-    $HistoryComplaintCount = 0;
-}
+// if ($result) {
+//     $row = mysqli_fetch_assoc($result);
+//     $HistoryComplaintCount = $row["HistoryComplaintCount"];
+// } else {
+//     $HistoryComplaintCount = 0;
+// }
 
 // Query to fetch user information
 $query = "SELECT * FROM user WHERE UserID = '$UserID'";
@@ -129,7 +130,7 @@ if ($result && mysqli_num_rows($result) == 1) {
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">
-              <h2 class="text-center mb-4">User Profile</h2>
+              <h3 class="text-center mb-4">User Profile</h3>
                 <hr style="width: 350px; text-align: center">
               
             </div>
@@ -233,100 +234,47 @@ if ($result && mysqli_num_rows($result) == 1) {
                                   <div class="col-md-10"> <!-- Adjusted column width for form -->
                                     <div class="user_profile_container">
                                       <form action="update_profile.php" method="POST" enctype="multipart/form-data"> 
-                                        <div class="form-group">
-                                          <label for="first_name">First Name:</label>
-                                          <input type="text" class="form-control" id="first_name" name="first_name" value="<?php echo $UserFirstName; ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="first_name">Last Name:</label>
-                                          <input type="text" class="form-control" id="last_name" name="last_name" value="<?php if (
-                                              isset($UserLastName)
-                                          ) {
-                                              echo $UserLastName;
-                                          } ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="first_name">Username:</label>
-                                          <input type="text" class="form-control" id="username" name="username" value="<?php if (
-                                              isset($UserUserName)
-                                          ) {
-                                              echo $UserUserName;
-                                          } ?>"  required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="first_name">Occupation:</label>
-                                          <input type="text" class="form-control" id="occupation" name="occupation" value="<?php if (
-                                              isset($UserOccupation)
-                                          ) {
-                                              echo $UserOccupation;
-                                          } ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="first_name">Martial Status:</label>
-                                          <select class="form-control" id="marital_status" name="marital_status">
-                                            <option value="" disabled selected>Select Status</option>
-                                                      <option value="Married" <?php if (
-                                                          isset(
-                                                              $UserMartialStatus
-                                                          ) &&
-                                                          $UserMartialStatus ==
-                                                              "Married"
-                                                      ) {
-                                                          echo 'selected="selected"';
-                                                      } ?>>Married</option>
-                                                      <option value="Unmmaried" <?php if (
-                                                          isset(
-                                                              $UserMartialStatus
-                                                          ) &&
-                                                          $UserMartialStatus ==
-                                                              "Unmmaried"
-                                                      ) {
-                                                          echo 'selected="selected"';
-                                                      } ?>>Unmmaried</option>
-                                                      <option value="Divorced" <?php if (
-                                                          isset(
-                                                              $UserMartialStatus
-                                                          ) &&
-                                                          $UserMartialStatus ==
-                                                              "Divorced"
-                                                      ) {
-                                                          echo 'selected="selected"';
-                                                      } ?>>Divorced</option>
-                                                      <option value="Widowed" <?php if (
-                                                          isset(
-                                                              $UserMartialStatus
-                                                          ) &&
-                                                          $UserMartialStatus ==
-                                                              "Widowed"
-                                                      ) {
-                                                          echo 'selected="selected"';
-                                                      } ?>>Widowed</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="Age">Age:</label>
-                                          <input type="text" class="form-control" id="age" name="age" value="<?php echo $UserAge; ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="contact_details">Contact Details:</label>
-                                           <input type="text" class="form-control" id="contact_details" name="contact_details" value="<?php if (
-                                               isset($UserContactDetails)
-                                           ) {
-                                               echo $UserContactDetails;
-                                           } ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="UserEmail">Email:</label>
-                                          <input type="text" class="form-control" id="UserEmail" name="UserEmail" value="<?php if (
-                                              isset($UserEmail)
-                                          ) {
-                                              echo $UserEmail;
-                                          } ?>" required>
-                                        </div>
-                                        <div class="form-group">
-                                          <label for="profile_picture">Profile Picture: </label>
-                                          <input type="file" class="form-control-file" id="profile_picture" name="profile_picture" accept="image/*"></label>
-                                        </div>
+                                      <div class="card mb-4 p-3 shadow-sm rounded">
+                                         <div class="row g-3">
+                                             <div class="col-md-6">
+                                                 <div class="d-flex justify-content-between align-items-left mb-2">
+                                                     <h6 class="mb-0">First Name:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserFirstName); ?></p>
+                                                 </div>
+                                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                                     <h6 class="mb-0">Last Name:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserLastName); ?></p>
+                                                 </div>
+                                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                                     <h6 class="mb-0">Occupation:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserOccupation); ?></p>
+                                                 </div>
+                                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                                     <h6 class="mb-0">Email:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserEmail); ?></p>
+                                                 </div>
+                                             </div>
+                                             <div class="col-md-6">
+                                                 <div class="d-flex justify-content-between align-items-left mb-2">
+                                                     <h6 class="mb-0">Username:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserUserName); ?></p>
+                                                 </div>
+                                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                                     <h6 class="mb-0">Marital Status:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserMartialStatus); ?></p>
+                                                 </div>
+                                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                                     <h6 class="mb-0">Age:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserAge); ?></p>
+                                                 </div>
+                                                 <div class="d-flex justify-content-between align-items-center mb-2">
+                                                     <h6 class="mb-0">Contact Details:</h6>
+                                                     <p class="text-muted mb-0"><?php echo htmlspecialchars($UserContactDetails); ?></p>
+                                                 </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                                      
                     
                                         <!-- Hidden input field to send user ID for updating -->
                                         <input type="hidden" name="user_id" value="<?php echo $UserID; ?>">
@@ -435,7 +383,7 @@ if ($result && mysqli_num_rows($result) == 1) {
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">
-              <h2 class="text-center mb-4">Activity History</h2>
+              <h4 class="text-center mb-4">Activity History</h4>
             </div>
             <div class="card">
               <div class="col-md-12">
@@ -458,10 +406,10 @@ if ($result && mysqli_num_rows($result) == 1) {
                   <i class="fa fa-history" aria-hidden="true"></i>
                     History
                   </a>
-                  <div class="card" style="float: right; padding: 10px;">
+                  <!-- <div class="card" style="float: right; padding: 10px;">
                     
                     <span><?php echo $history_count; ?></span>
-                  </div>
+                  </div> -->
                 </li>
                     </h5>
               </ul>
@@ -473,7 +421,7 @@ if ($result && mysqli_num_rows($result) == 1) {
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">
-              <h2 class="text-center mb-4">Donations Made</h2>
+              <h4 class="text-center mb-4">Donations Made</h4>
             </div>
             <div class="card">
               <div class="col-md-12">
@@ -484,10 +432,10 @@ if ($result && mysqli_num_rows($result) == 1) {
                   <i class="fa fa-history" aria-hidden="true"></i>
                     History
                   </a>
-                  <div class="card" style="float: right; padding: 10px;">
+                  <!-- <div class="card" style="float: right; padding: 10px;">
                     
                     <span><?php echo $DonationCount; ?></span>
-                  </div>
+                  </div> -->
                     </h5>
                 </li>
               </ul>
@@ -498,7 +446,7 @@ if ($result && mysqli_num_rows($result) == 1) {
         <div class="card mb-3">
           <div class="card-body">
             <div class="heading_container heading_center">  
-              <h2 class="text-center mb-4">Complaints</h2>
+              <h4 class="text-center mb-4">Complaints</h4>
             </div>
             <div class="card">
               <div class="col-md-12">
@@ -534,9 +482,9 @@ if ($result && mysqli_num_rows($result) == 1) {
                   <i class="fa fa-history" aria-hidden="true"></i>
                     History
                   </a>
-                  <div class="card" style="float: right; padding: 10px;">
+                  <!-- <div class="card" style="float: right; padding: 10px;">
                     <span><?php echo $HistoryComplaintCount; ?></span>
-                  </div>
+                  </div> -->
                     </h5>
                 </li>
 

@@ -68,6 +68,9 @@ $total_pages = ceil($row_count / $results_per_page);
                         <li class="nav-item">
                             <a class="nav-link" href="add-donation.php">Add Donations</a>
                         </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="Insertdonation.php">Manual Insert</a>
+                        </li> -->
                         <li class="nav-item">
                             <a class="nav-link" href="donation-history.php">History</a>
                         </li>

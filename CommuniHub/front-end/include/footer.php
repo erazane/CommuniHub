@@ -6,7 +6,7 @@
       <h4>
         Get In Touch
       </h4>
-      <div class="row">
+      <      <div class="row">
         <div class="col-lg-10 mx-auto">
           <div class="info_items">
             <div class="row">
@@ -17,7 +17,7 @@
                       <i class="fa fa-map-marker" aria-hidden="true"></i>
                     </div>
                     <p>
-                      Lorem Ipsum is simply dummy text
+                      Univeristi Kuala Lumpur
                     </p>
                   </div>
                 </a>
@@ -29,7 +29,7 @@
                       <i class="fa fa-phone" aria-hidden="true"></i>
                     </div>
                     <p>
-                      +02 1234567890
+                      +012 -6497487
                     </p>
                   </div>
                 </a>
@@ -41,7 +41,7 @@
                       <i class="fa fa-envelope" aria-hidden="true"></i>
                     </div>
                     <p>
-                      demo@gmail.com
+                      nazeera.nashar@gmail.com
                     </p>
                   </div>
                 </a>
@@ -83,10 +83,10 @@
         &copy; <span id="displayDateYear"></span> All Rights Reserved By
         
       </p>
-      <p>
+      <!-- <p>
       <a class="nav-link" href="../admin/adminLogin.php">Admin</a>
          <a class="nav-link" href="../commitee/login/commiteeLogin.php">Committee </a>
-      </p>
+      </p> -->
     </div>
   </footer>
   <!-- footer section -->

@@ -66,7 +66,7 @@ if (!$result) {
                             <th scope="col">Date</th>
                             <th scope="col">Time</th>
                             <th scope="col">Type</th>
-                            <th scope="col">Action</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -81,12 +81,7 @@ if (!$result) {
                                 <td><?php echo $row['ActivityDate']; ?></td>
                                 <td><?php echo $row['ActivityTime']; ?></td>
                                 <td><?php echo $row['ActivityType']; ?></td>
-                                <td>
-                                    <div class="btn-group" style="padding: 5;">
-                                        
-                                        <button type="button" class="btn btn-warning mb-2" onclick="deleteActivity(<?php echo $row['ActivityID']; ?>)">Delete </button>
-                                    </div>
-                                </td>
+                                
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -99,7 +94,7 @@ if (!$result) {
         </div>
     </div>
 </section>
-
+<!-- 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
     function deleteActivity(ActivityID) {
@@ -119,6 +114,6 @@ if (!$result) {
             }
         });
     }
-</script>
+</script> -->
 
 <?php include('include/footer.php'); ?>

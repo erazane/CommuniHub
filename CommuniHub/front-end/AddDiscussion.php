@@ -39,16 +39,20 @@ if (isset($_POST['title']) && isset($_POST['description'])) {
 ?>
 
 <br>
+<br>
 <div class="container" style="max-width: 1500px;">
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="heading_container heading_center">
                 <h2>Add Discussions</h2>
                 <hr style="width: 350px; text-align: center">
+                <div class="img-box">
+        <img src="./images/discussions.jpg" class="img-fluid rounded-circle" width="300" height="300" alt="Upload Receipt File">
+    </div>
             </div>
         </div>
     </div>
-
+    
     <div class="row justify-content-center mt-3">
         <div class="col-md-12">
             <div class="card mb-3">
