@@ -279,11 +279,11 @@ if ($result) {
                            <br>
                            <div class="d-flex justify-content-center mt-4">
                                     
-                           <a href="uploadReceipt.php?UserID=<?php echo $_SESSION['UserID']; ?>&DonationID=<?php echo $DonationID; ?>" class="btn btn-primary btn-lg">Upload Receipt</a>
+                           <!-- <a href="uploadReceipt.php?UserID=<?php echo $_SESSION['UserID']; ?>&DonationID=<?php echo $DonationID; ?>" class="btn btn-primary btn-lg">Upload Receipt</a> -->
 
                                 </div>
                            <br>
-                           <!-- <p style="color: #ff6a19; font-size: 16px;" class="mt-2"><b>Note:</b> When you make a transfer, please send the evidence to communiHub@gmail.com for confirmation. Thank you.</p> -->
+                           <p style="color: #ff6a19; font-size: 16px;" class="mt-2"><b>Note:</b> When you make a transfer, please send the evidence to communiHub@gmail.com for confirmation. Thank you.</p>
                            <br>
                            <!-- <div class="text-center">
                                 <button type="button" onclick="addReceipt();" class="btn btn-primary btn-lg">Confirm</button>

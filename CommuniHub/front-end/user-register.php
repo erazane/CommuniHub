@@ -2,34 +2,29 @@
 session_start();
 require_once ('../Database/database.php');
 
-if (isset($_POST['Submit'])){
+if (isset($_POST['Submit'])) {
+    // Sanitize inputs
+    $UserFirstName = mysqli_real_escape_string($dbc, $_POST['UserFirstName']);
+    $UserLastName = mysqli_real_escape_string($dbc, $_POST['UserLastName']);
+    $UserUserName = mysqli_real_escape_string($dbc, $_POST['UserUserName']);
+    $UserPwd = crypt($_POST['UserPwd'], 'ahookdemok'); // Using a fixed salt for simplicity here
     
-        
-    $UserFirstName = $_POST['UserFirstName'];
-    $UserLastName = $_POST['UserLastName'];
-    $UserUserName = $_POST['UserUserName'];
-    $UserPwd = crypt($_POST['UserPwd'], 'ahookdemok');
-      
     // Check for empty fields
     if (!empty($UserFirstName) && !empty($UserLastName) && !empty($UserUserName) && !empty($UserPwd)) {
         // Check for existing user
-        $query = "SELECT UserID FROM user WHERE UserFirstName='$UserFirstName' AND UserLastName='$UserLastName'";
+        $query = "SELECT UserID FROM user WHERE UserUserName='$UserUserName'";
         $result = mysqli_query($dbc, $query);
-        if (mysqli_num_rows($result) == 0) {
+
+        if ($result && mysqli_num_rows($result) == 0) {
             // Insert user data into the database
             $query = "INSERT INTO user (UserFirstName, UserLastName, UserUserName, UserPwd) 
                       VALUES ('$UserFirstName', '$UserLastName', '$UserUserName', '$UserPwd')";
-            $result = mysqli_query($dbc, $query);
+            $insertResult = mysqli_query($dbc, $query);
 
-            $userRow = mysqli_fetch_assoc($result);
-            $_SESSION['user'] = $UserUserName;
-            $_SESSION['UserFirstName'] = $userRow['UserFirstName'];
-            $_SESSION['UserLastName'] = $userRow['UserLastName'];
-            
-            if ($result) {
+            if ($insertResult) {
                 // Registration successful
                 $_SESSION['register'] = "<div class='success'>Registration Successful.</div>";
-                header('Location: http://localhost/php-projects/CommuniHub/front-end/indexLogin.php');
+                header('Location: http://localhost/php-projects/CommuniHub/front-end/index.php');
                 exit();
             } else {
                 // Registration failed
@@ -50,7 +45,6 @@ if (isset($_POST['Submit'])){
         exit();
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -58,14 +52,11 @@ if (isset($_POST['Submit'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Committee Login Page</title>
-
+    <title>Committee Register Page</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- SweetAlert CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.1.4/sweetalert2.min.css" rel="stylesheet">
-
     <!-- Custom styles for this template -->
     <style>
         body {

@@ -44,7 +44,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: manage-activities.php');
     exit();
 }
-// If not a POST request, redirect back to manage-donation.php
-header('Location: manage-activities.php');
-exit();
-?>

@@ -20,7 +20,7 @@ $sessionUserID = $_SESSION["UserID"];
 $filterType = isset($_GET['filterType']) ? $_GET['filterType'] : '';
 $filterOrder = isset($_GET['filterOrder']) ? $_GET['filterOrder'] : 'DESC';
 
-// Fetch available activities
+// Fetch available ongoing activities
 $query = "SELECT  
     ActivityID, ActivityName, ActivityLocation, ActivityDate, ActivityTime, ActivityType
     FROM activities
@@ -29,7 +29,8 @@ $query = "SELECT
         SELECT ActivityID
         FROM activitiesjoined
         WHERE activitiesjoined.UserID = '$sessionUserID'
-    )";
+    )
+    AND Status = 'Ongoing'"; // Only ongoing activities
 
 // Apply type filter if selected
 if (!empty($filterType)) {
@@ -37,7 +38,7 @@ if (!empty($filterType)) {
 }
 
 // Apply order filter
-$query .= " ORDER BY ActivityID $filterOrder";
+$query .= " ORDER BY ActivityDate $filterOrder, ActivityTime $filterOrder"; // Sort by date and time
 
 $result = mysqli_query($dbc, $query);
 if (!$result) {
@@ -82,7 +83,7 @@ if (isset($_GET['ActivityID']) && isset($_GET['DateJoined'])) {
                             <option value="Clean-up Day" <?php if ($filterType == 'Clean-up Day') echo 'selected'; ?>>Clean-up Day</option>
                             <option value="Block-Party" <?php if ($filterType == 'Block-Party') echo 'selected'; ?>>Block-Party</option>
                             <option value="Community-Garden" <?php if ($filterType == 'Community-Garden') echo 'selected'; ?>>Community Garden</option>
-                            <option value="Fitness-Classes" <?php if ($filterType == 'Fitness-Classes') echo 'selected'; ?>>Fitness-Classes</option>
+                            <option value="Fitness-Classes" <?php if ($filterType == 'Fitness-Classes') echo 'selected'; ?>>Fitness Classes</option>
                             <option value="Holiday-Celebrations" <?php if ($filterType == 'Holiday-Celebrations') echo 'selected'; ?>>Holiday Celebrations</option>
                             <option value="Workshops" <?php if ($filterType == 'Workshops') echo 'selected'; ?>>Workshops</option>
                         </select>
@@ -106,7 +107,7 @@ if (isset($_GET['ActivityID']) && isset($_GET['DateJoined'])) {
                 $ActivityLocation = $row['ActivityLocation'];
                 $ActivityDate = $row['ActivityDate'];
                 $ActivityTime = $row['ActivityTime'];
-                $ActivityType = $row['ActivityType']; 
+                $ActivityType = $row['ActivityType'];
 
                 // Define an associative array to map activity types to image paths
                 $activityImages = array(
@@ -130,7 +131,7 @@ if (isset($_GET['ActivityID']) && isset($_GET['DateJoined'])) {
                 <div class="col-sm-6 col-md-4 mx-auto">
                     <div class="box">
                         <div class="img-box" style="width:auto;">
-                            <img src="images/activity/<?php echo $imagePath; ?>" alt="<?php echo $ActivityType; ?>">
+                            <img src="images/activity/<?php echo $imagePath; ?>" alt="<?php echo htmlspecialchars($ActivityType); ?>">
                         </div>
                         <div class="detail-box">
                             <h5><?php echo htmlspecialchars($ActivityName); ?></h5>
